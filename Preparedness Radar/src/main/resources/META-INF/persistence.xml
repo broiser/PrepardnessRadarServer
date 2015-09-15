@@ -1,0 +1,20 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+	<persistence-unit name="crowdSA" transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/crowdSA</jta-data-source>
+		<class>at.jku.cis.radar.model.BaseEntity</class>
+		<class>at.jku.cis.radar.model.Event</class>
+		<class>at.jku.cis.radar.model.Action</class>
+		<properties>
+			<property name="dialect"
+				value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
+			<property name="connection.driver_class" value="org.postgresql.Driver" />
+			<property name="show_sql" value="true" />
+			<property name="format_sql" value="true" />
+			<property name="hbm2ddl.auto" value="validate" />
+		</properties>
+	</persistence-unit>
+</persistence>
