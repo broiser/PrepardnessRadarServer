@@ -8,11 +8,11 @@
 
 	<properties>
 		<javaee.version>7.0</javaee.version>
+		<jackson.version>3.0.10.Final</jackson.version>
 		<hibernate.version>5.0.1.Final</hibernate.version>
 		<postgresql.version>9.3-1103-jdbc4</postgresql.version>
 	</properties>
 
-	<!-- add repositories for JTS and Hibernate Spatial and Hibernate (JBoss) -->
 	<repositories>
 		<repository>
 			<id>OSGEO GeoTools repo</id>
@@ -22,7 +22,6 @@
 			<id>Hibernate Spatial repo</id>
 			<url>http://www.hibernatespatial.org/repository</url>
 		</repository>
-		<!-- add JBOSS repository for easy access to Hibernate libraries -->
 		<repository>
 			<id>JBOSS</id>
 			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
@@ -50,7 +49,16 @@
 					<artifactId>jboss-logging</artifactId>
 					<groupId>org.jboss.logging</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>postgresql</artifactId>
+					<groupId>postgresql</groupId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>

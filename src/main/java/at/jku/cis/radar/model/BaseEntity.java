@@ -26,4 +26,12 @@ public abstract class BaseEntity implements Serializable {
     public int hashCode() {
         return (int) id * 13;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BaseEntity)) {
+            return false;
+        }
+        return ((BaseEntity) obj).id == id;
+    }
 }
