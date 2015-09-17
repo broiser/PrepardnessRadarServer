@@ -1,4 +1,4 @@
-package at.jku.cis.radar.model.rest;
+package at.jku.cis.radar.model;
 
 import java.util.ArrayList;
 import java.util.List;

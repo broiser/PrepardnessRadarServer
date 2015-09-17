@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 
 import at.jku.cis.radar.dao.EventDao;
 import at.jku.cis.radar.model.Event;
-import at.jku.cis.radar.model.rest.FeatureCollection;
+import at.jku.cis.radar.model.FeatureCollection;
 
 @Path("layers")
 @Produces(MediaType.APPLICATION_JSON)
