@@ -5,17 +5,17 @@
 	<persistence-unit name="crowdSA" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/crowdSA</jta-data-source>
-		<class>at.jku.cis.radar.model.BaseEntity</class>
 		<class>at.jku.cis.radar.model.Event</class>
 		<class>at.jku.cis.radar.model.Action</class>
 		<class>at.jku.cis.radar.model.Feature</class>
+		<class>at.jku.cis.radar.model.FeatureEvoluation</class>
+		<class>at.jku.cis.radar.model.BaseEntity</class>
 		<properties>
-			<property name="dialect"
+			<property name="hibernate.dialect"
 				value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
-			<property name="connection.driver_class" value="org.postgresql.Driver" />
-			<property name="show_sql" value="true" />
-			<property name="format_sql" value="true" />
-			<property name="hbm2ddl.auto" value="validate" />
+			<property name="hibernate.hbm2ddl.auto" value="validate" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.show_sql" value="true" />
 		</properties>
 	</persistence-unit>
 </persistence>

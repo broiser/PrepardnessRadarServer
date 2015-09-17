@@ -9,7 +9,7 @@
 	<properties>
 		<javaee.version>7.0</javaee.version>
 		<jackson.version>3.0.10.Final</jackson.version>
-		<hibernate.version>5.0.1.Final</hibernate.version>
+		<hibernate.version>4.3.7.Final</hibernate.version>
 		<postgresql.version>9.3-1103-jdbc4</postgresql.version>
 	</properties>
 
@@ -39,12 +39,8 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-spatial</artifactId>
-			<version>${hibernate.version}</version>
+			<version>4.3</version>
 			<exclusions>
-				<exclusion>
-					<artifactId>hibernate-core</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
 				<exclusion>
 					<artifactId>jboss-logging</artifactId>
 					<groupId>org.jboss.logging</groupId>
@@ -52,6 +48,14 @@
 				<exclusion>
 					<artifactId>postgresql</artifactId>
 					<groupId>postgresql</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jboss-logging-annotations</artifactId>
+					<groupId>org.jboss.logging</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-core</artifactId>
+					<groupId>org.hibernate</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -69,9 +73,14 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>${hibernate.version}</version>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<artifactId>jboss-logging</artifactId>
+					<groupId>org.jboss.logging</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jboss-logging-annotations</artifactId>
 					<groupId>org.jboss.logging</groupId>
 				</exclusion>
 			</exclusions>
