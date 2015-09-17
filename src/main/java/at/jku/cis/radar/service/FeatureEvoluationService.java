@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 
 import at.jku.cis.radar.dao.EventDao;
+import at.jku.cis.radar.dao.FeatureDao;
 import at.jku.cis.radar.dao.FeatureEvoluationDao;
 import at.jku.cis.radar.model.Event;
 import at.jku.cis.radar.model.Feature;
@@ -21,6 +22,8 @@ public class FeatureEvoluationService implements Serializable {
 
     @Inject
     private EventDao eventDao;
+    @Inject
+    private FeatureDao featureDao;
     @Inject
     private FeatureEvoluationDao featureEvoluationDao;
 
@@ -36,7 +39,8 @@ public class FeatureEvoluationService implements Serializable {
         }
         Date date = DateTime.now().toDate();
         for (Feature feature : features) {
-            featureEvoluationDao.save(createFeatureEvoluation(event, feature, date));
+            Feature createdFeature = featureDao.create(feature);
+            featureEvoluationDao.create(createFeatureEvoluation(event, createdFeature, date));
         }
     }
 

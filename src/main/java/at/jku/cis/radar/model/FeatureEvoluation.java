@@ -7,14 +7,14 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 @Entity
-@NamedQuery(name = FeatureEvoluation.FIND_LATEST_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :event ORDER BY fe.date")
+@NamedQuery(name = FeatureEvoluation.FIND_LATEST_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :eventId ORDER BY fe.date DESC")
 public class FeatureEvoluation extends BaseEntity {
     public static final String FIND_LATEST_BY_EVENT = "FeatureEvoluation.findLatestByEvent";
 
     @OneToOne
-    private Feature feature;
-    @OneToOne
     private Event event;
+    @OneToOne
+    private Feature feature;
     private Date date;
 
     public Feature getFeature() {
