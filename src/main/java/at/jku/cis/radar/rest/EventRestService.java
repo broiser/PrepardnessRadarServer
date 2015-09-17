@@ -20,5 +20,4 @@ public class EventRestService implements RestService {
     public Response getEvents() {
         return Response.ok(eventDao.findAll()).build();
     }
-
 }

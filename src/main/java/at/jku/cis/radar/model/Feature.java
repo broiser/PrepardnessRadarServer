@@ -3,6 +3,8 @@ package at.jku.cis.radar.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.Entity;
+
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -11,6 +13,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import at.jku.cis.radar.rest.serializer.GeometryDeserializer;
 import at.jku.cis.radar.rest.serializer.GeometrySerializer;
 
+@Entity
 public class Feature extends GeoJsonObject {
 
     @JsonSerialize(using = GeometrySerializer.class)

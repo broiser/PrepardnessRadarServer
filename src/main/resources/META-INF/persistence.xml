@@ -8,6 +8,7 @@
 		<class>at.jku.cis.radar.model.BaseEntity</class>
 		<class>at.jku.cis.radar.model.Event</class>
 		<class>at.jku.cis.radar.model.Action</class>
+		<class>at.jku.cis.radar.model.Feature</class>
 		<properties>
 			<property name="dialect"
 				value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
