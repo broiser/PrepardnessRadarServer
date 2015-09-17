@@ -3,10 +3,13 @@ package at.jku.cis.radar.model;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 @Entity
+@NamedQuery(name = FeatureEvoluation.FIND_LATEST_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :event ORDER BY fe.date")
 public class FeatureEvoluation extends BaseEntity {
+    public static final String FIND_LATEST_BY_EVENT = "FeatureEvoluation.findLatestByEvent";
 
     @OneToOne
     private Feature feature;

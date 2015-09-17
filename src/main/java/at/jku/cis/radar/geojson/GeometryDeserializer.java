@@ -1,56 +1,55 @@
-package at.jku.cis.radar.rest.serializer;
+package at.jku.cis.radar.geojson;
+
+import static at.jku.cis.radar.geojson.GeoJsonObject.COORDINATES;
+import static at.jku.cis.radar.geojson.GeoJsonObject.GEOMETRIES;
+import static at.jku.cis.radar.geojson.GeoJsonObject.TYPE;
 
 import java.io.IOException;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
-    private GeometryFactory gemetryFactory = new GeometryFactory();
+    private GeometryFactory geometryFactory = new GeometryFactory();
 
     @Override
     public Geometry deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
             throws IOException, JsonProcessingException {
-        ObjectCodec objectCodec = jsonParser.getCodec();
-        return parseGeometry(objectCodec.readTree(jsonParser));
+        return parseGeometry(jsonParser.getCodec().readTree(jsonParser));
     }
 
     private Geometry parseGeometry(JsonNode root) {
-        String typeName = root.get("type").asText();
-        if (typeName.equals("Point")) {
-            return gemetryFactory.createPoint(parseCoordinate(root.get("coordinates")));
-
-        } else if (typeName.equals("MultiPoint")) {
-            return gemetryFactory.createMultiPoint(parseLineString(root.get("coordinates")));
-
-        } else if (typeName.equals("LineString")) {
-            return gemetryFactory.createLineString(parseLineString(root.get("coordinates")));
-
-        } else if (typeName.equals("MultiLineString")) {
-            return gemetryFactory.createMultiLineString(parseLineStrings(root.get("coordinates")));
-
-        } else if (typeName.equals("Polygon")) {
-            JsonNode arrayOfRings = root.get("coordinates");
-            return parsePolygonCoordinates(arrayOfRings);
-
-        } else if (typeName.equals("MultiPolygon")) {
-            JsonNode arrayOfPolygons = root.get("coordinates");
-            return gemetryFactory.createMultiPolygon(parsePolygons(arrayOfPolygons));
-
-        } else if (typeName.equals("GeometryCollection")) {
-            return gemetryFactory.createGeometryCollection(parseGeometries(root.get("geometries")));
+        String typeName = root.get(TYPE).asText();
+        if (typeName.equals(Point.class.getSimpleName())) {
+            return geometryFactory.createPoint(parseCoordinate(root.get(COORDINATES)));
+        } else if (typeName.equals(MultiPoint.class.getSimpleName())) {
+            return geometryFactory.createMultiPoint(parseLineString(root.get(COORDINATES)));
+        } else if (typeName.equals(LineString.class.getSimpleName())) {
+            return geometryFactory.createLineString(parseLineString(root.get(COORDINATES)));
+        } else if (typeName.equals(MultiLineString.class.getSimpleName())) {
+            return geometryFactory.createMultiLineString(parseLineStrings(root.get(COORDINATES)));
+        } else if (typeName.equals(Polygon.class.getSimpleName())) {
+            return parsePolygonCoordinates(root.get(COORDINATES));
+        } else if (typeName.equals(MultiPolygon.class.getSimpleName())) {
+            return geometryFactory.createMultiPolygon(parsePolygons(root.get(COORDINATES)));
+        } else if (typeName.equals(GeometryCollection.class.getSimpleName())) {
+            return geometryFactory.createGeometryCollection(parseGeometries(root.get(GEOMETRIES)));
         } else {
             throw new UnsupportedOperationException();
         }
@@ -65,7 +64,7 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
     }
 
     private Polygon parsePolygonCoordinates(JsonNode arrayOfRings) {
-        return gemetryFactory.createPolygon(parseExteriorRing(arrayOfRings), parseInteriorRings(arrayOfRings));
+        return geometryFactory.createPolygon(parseExteriorRing(arrayOfRings), parseInteriorRings(arrayOfRings));
     }
 
     private Polygon[] parsePolygons(JsonNode arrayOfPolygons) {
@@ -77,13 +76,13 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
     }
 
     private LinearRing parseExteriorRing(JsonNode arrayOfRings) {
-        return gemetryFactory.createLinearRing(parseLineString(arrayOfRings.get(0)));
+        return geometryFactory.createLinearRing(parseLineString(arrayOfRings.get(0)));
     }
 
     private LinearRing[] parseInteriorRings(JsonNode arrayOfRings) {
         LinearRing rings[] = new LinearRing[arrayOfRings.size() - 1];
         for (int i = 1; i < arrayOfRings.size(); ++i) {
-            rings[i - 1] = gemetryFactory.createLinearRing(parseLineString(arrayOfRings.get(i)));
+            rings[i - 1] = geometryFactory.createLinearRing(parseLineString(arrayOfRings.get(i)));
         }
         return rings;
     }
@@ -103,7 +102,7 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
     private LineString[] parseLineStrings(JsonNode array) {
         LineString[] strings = new LineString[array.size()];
         for (int i = 0; i != array.size(); ++i) {
-            strings[i] = gemetryFactory.createLineString(parseLineString(array.get(i)));
+            strings[i] = geometryFactory.createLineString(parseLineString(array.get(i)));
         }
         return strings;
     }

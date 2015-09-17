@@ -12,11 +12,12 @@ import org.hibernate.annotations.Type;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import at.jku.cis.radar.rest.serializer.GeometryDeserializer;
-import at.jku.cis.radar.rest.serializer.GeometrySerializer;
+import at.jku.cis.radar.geojson.GeoJsonObject;
+import at.jku.cis.radar.geojson.GeometryDeserializer;
+import at.jku.cis.radar.geojson.GeometrySerializer;
 
 @Entity
-public class Feature extends GeoJsonObject {
+public class Feature extends BaseEntity implements GeoJsonObject {
 
     @JsonSerialize(using = GeometrySerializer.class)
     @JsonDeserialize(using = GeometryDeserializer.class)
