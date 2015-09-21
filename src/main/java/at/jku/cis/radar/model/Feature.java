@@ -3,6 +3,7 @@ package at.jku.cis.radar.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
@@ -22,6 +23,7 @@ public class Feature extends BaseEntity implements GeoJsonObject {
     @JsonSerialize(using = GeometrySerializer.class)
     @JsonDeserialize(using = GeometryDeserializer.class)
     @Type(type = "org.hibernate.spatial.GeometryType")
+    @Column(name = "geometry", columnDefinition = "Geometry")
     private Geometry geometry;
     @Transient
     private Map<String, Object> properties = new HashMap<String, Object>();
