@@ -13,7 +13,11 @@ public class FeatureCollection implements GeoJsonObject {
     }
 
     public FeatureCollection(Feature feature) {
-        features.add(feature);
+        this.features.add(feature);
+    }
+
+    public FeatureCollection(List<Feature> features) {
+        this.features.addAll(features);
     }
 
     public List<Feature> getFeatures() {

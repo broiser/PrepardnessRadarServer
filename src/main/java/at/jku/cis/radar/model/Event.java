@@ -10,7 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
+
+import org.joda.time.Period;
 
 @Entity
 @NamedQuery(name = Event.FIND_BY_NAME, query = "SELECT e FROM Event e WHERE e.name = :" + Event.NAME)
@@ -25,11 +26,10 @@ public class Event extends BaseEntity {
     private String name;
     private int color;
     private boolean visible;
+    private Period validationPeriod;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
     private List<Event> events;
-    @Transient
-    private List<Action> actions;
 
     public Event() {
     }
@@ -71,11 +71,11 @@ public class Event extends BaseEntity {
         this.events = events;
     }
 
-    public List<Action> getActions() {
-        return actions;
+    public Period getValidationPeriod() {
+        return validationPeriod;
     }
 
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
+    public void setValidationPeriod(Period validationPeriod) {
+        this.validationPeriod = validationPeriod;
     }
 }

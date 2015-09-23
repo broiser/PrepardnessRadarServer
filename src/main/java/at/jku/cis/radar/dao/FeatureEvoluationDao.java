@@ -1,5 +1,8 @@
 package at.jku.cis.radar.dao;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 
 import at.jku.cis.radar.model.FeatureEvoluation;
@@ -16,4 +19,8 @@ public class FeatureEvoluationDao extends AbstractDao<FeatureEvoluation> {
                 .setMaxResults(1));
     }
 
+    public List<FeatureEvoluation> findBetween(long eventId, Date fromDate, Date toDate) {
+        return createNamedQuery(FeatureEvoluation.FIND_BETWEEN_BY_EVENT).setParameter("eventId", eventId)
+                .setParameter("fromDate", fromDate).setParameter("toDate", toDate).getResultList();
+    }
 }

@@ -23,7 +23,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometrySerializer extends JsonSerializer<Geometry> {
-
     private static final String NOT_IMPLEMENTED = "Not implemented: {0}";
 
     @Override
@@ -118,7 +117,6 @@ public class GeometrySerializer extends JsonSerializer<Geometry> {
         jgen.writeStringField(TYPE, Polygon.class.getSimpleName());
         jgen.writeFieldName(COORDINATES);
         writePolygonCoordinates(jgen, value);
-
         jgen.writeEndObject();
     }
 
@@ -126,7 +124,6 @@ public class GeometrySerializer extends JsonSerializer<Geometry> {
             throws IOException, JsonGenerationException {
         jgen.writeStartArray();
         writeLineStringCoords(jgen, value.getExteriorRing());
-
         for (int i = 0; i != value.getNumInteriorRing(); ++i) {
             writeLineStringCoords(jgen, value.getInteriorRingN(i));
         }
@@ -137,8 +134,7 @@ public class GeometrySerializer extends JsonSerializer<Geometry> {
             throws JsonGenerationException, IOException {
         jgen.writeStartArray();
         for (int i = 0; i != ring.getNumPoints(); ++i) {
-            Point p = ring.getPointN(i);
-            writePointCoords(jgen, p);
+            writePointCoords(jgen, ring.getPointN(i));
         }
         jgen.writeEndArray();
     }

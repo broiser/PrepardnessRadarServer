@@ -31,12 +31,15 @@ public class FeatureEvoluationService implements Serializable {
         return featureEvoluationDao.findLatest(eventId);
     }
 
+    public List<FeatureEvoluation> findBetween(long eventId, DateTime from, DateTime to) {
+        Event event = eventDao.findById(eventId);
+        DateTime fromDate = from.minus(event.getValidationPeriod());
+        return featureEvoluationDao.findBetween(eventId, fromDate.toDate(), to.toDate());
+    }
+
     @Transactional
     public void save(long eventId, List<Feature> features) {
         Event event = eventDao.findById(eventId);
-        if (event == null) {
-            throw new IllegalArgumentException();
-        }
         Date date = DateTime.now().toDate();
         for (Feature feature : features) {
             Feature createdFeature = featureDao.create(feature);

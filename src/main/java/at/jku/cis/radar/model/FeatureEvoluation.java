@@ -3,18 +3,25 @@ package at.jku.cis.radar.model;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
-@NamedQuery(name = FeatureEvoluation.FIND_LATEST_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :eventId ORDER BY fe.date DESC")
+@NamedQueries({
+        @NamedQuery(name = FeatureEvoluation.FIND_LATEST_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :eventId ORDER BY fe.date DESC"),
+        @NamedQuery(name = FeatureEvoluation.FIND_BETWEEN_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :eventId AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date DESC") })
 public class FeatureEvoluation extends BaseEntity {
     public static final String FIND_LATEST_BY_EVENT = "FeatureEvoluation.findLatestByEvent";
+    public static final String FIND_BETWEEN_BY_EVENT = "FeatueEvoluation.findBetweenByEvent";
 
     @OneToOne
     private Event event;
     @OneToOne
     private Feature feature;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     public Feature getFeature() {

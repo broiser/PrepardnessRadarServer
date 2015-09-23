@@ -10,6 +10,8 @@
 		<class>at.jku.cis.radar.model.Feature</class>
 		<class>at.jku.cis.radar.model.FeatureEvoluation</class>
 		<class>at.jku.cis.radar.model.BaseEntity</class>
+
+		<class>at.jku.cis.radar.converter.PeriodHibernateConverter</class>
 		<properties>
 			<property name="hibernate.dialect"
 				value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
