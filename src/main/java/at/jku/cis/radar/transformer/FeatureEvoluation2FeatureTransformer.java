@@ -8,7 +8,7 @@ import at.jku.cis.radar.model.Feature;
 import at.jku.cis.radar.model.FeatureEvoluation;
 
 @ApplicationScoped
-public class FeatureTransformer implements Transformer<FeatureEvoluation, Feature> {
+public class FeatureEvoluation2FeatureTransformer implements Transformer<FeatureEvoluation, Feature> {
 
     @Override
     public Feature transform(FeatureEvoluation featureEvoluation) {

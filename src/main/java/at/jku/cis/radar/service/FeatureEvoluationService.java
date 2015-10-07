@@ -1,6 +1,7 @@
 package at.jku.cis.radar.service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,10 +28,6 @@ public class FeatureEvoluationService implements Serializable {
     @Inject
     private FeatureEvoluationDao featureEvoluationDao;
 
-    public FeatureEvoluation findLatest(long eventId) {
-        return featureEvoluationDao.findLatest(eventId);
-    }
-
     public List<FeatureEvoluation> findBetween(long eventId, DateTime from, DateTime to) {
         Event event = eventDao.findById(eventId);
         DateTime fromDate = from.minus(event.getValidationPeriod());
@@ -38,13 +35,31 @@ public class FeatureEvoluationService implements Serializable {
     }
 
     @Transactional
-    public void save(long eventId, List<Feature> features) {
+    public FeatureEvoluation update(long eventId, Feature feature) {
+        return save(eventId, feature);
+    }
+
+    @Transactional
+    public List<FeatureEvoluation> save(long eventId, List<Feature> features) {
         Event event = eventDao.findById(eventId);
         Date date = DateTime.now().toDate();
+        List<FeatureEvoluation> featureEvoluations = new ArrayList<>();
         for (Feature feature : features) {
-            Feature createdFeature = featureDao.create(feature);
-            featureEvoluationDao.create(createFeatureEvoluation(event, createdFeature, date));
+            featureEvoluations.add(saveFeatureEvoluation(feature, event, date));
         }
+        return featureEvoluations;
+    }
+
+    @Transactional
+    public FeatureEvoluation save(long eventId, Feature feature) {
+        Event event = eventDao.findById(eventId);
+        Date date = DateTime.now().toDate();
+        return saveFeatureEvoluation(feature, event, date);
+    }
+
+    private FeatureEvoluation saveFeatureEvoluation(Feature feature, Event event, Date date) {
+        Feature createdFeature = featureDao.create(feature);
+        return featureEvoluationDao.create(createFeatureEvoluation(event, createdFeature, date));
     }
 
     private FeatureEvoluation createFeatureEvoluation(Event event, Feature feature, Date date) {

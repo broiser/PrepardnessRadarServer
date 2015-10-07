@@ -38,18 +38,18 @@ public class GeometrySerializer extends JsonSerializer<Geometry> {
 
     private void writeGeometry(JsonGenerator jsonGenerator, Geometry geometry)
             throws JsonGenerationException, IOException {
-        if (geometry instanceof Polygon) {
-            writePolygon(jsonGenerator, (Polygon) geometry);
-        } else if (geometry instanceof Point) {
+        if (geometry instanceof Point) {
             writePoint(jsonGenerator, (Point) geometry);
         } else if (geometry instanceof MultiPoint) {
             writeMultiPoint(jsonGenerator, (MultiPoint) geometry);
-        } else if (geometry instanceof MultiPolygon) {
-            writeMultiPolygon(jsonGenerator, (MultiPolygon) geometry);
         } else if (geometry instanceof LineString) {
             writeLineString(jsonGenerator, (LineString) geometry);
         } else if (geometry instanceof MultiLineString) {
             writeMultiLineString(jsonGenerator, (MultiLineString) geometry);
+        } else if (geometry instanceof Polygon) {
+            writePolygon(jsonGenerator, (Polygon) geometry);
+        } else if (geometry instanceof MultiPolygon) {
+            writeMultiPolygon(jsonGenerator, (MultiPolygon) geometry);
         } else if (geometry instanceof GeometryCollection) {
             writeGeometryCollection(jsonGenerator, (GeometryCollection) geometry);
         } else {

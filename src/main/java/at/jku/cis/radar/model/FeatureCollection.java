@@ -1,6 +1,7 @@
 package at.jku.cis.radar.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import at.jku.cis.radar.geojson.GeoJsonObject;
@@ -16,7 +17,7 @@ public class FeatureCollection implements GeoJsonObject {
         this.features.add(feature);
     }
 
-    public FeatureCollection(List<Feature> features) {
+    public FeatureCollection(Collection<Feature> features) {
         this.features.addAll(features);
     }
 
