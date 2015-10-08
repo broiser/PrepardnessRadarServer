@@ -2,6 +2,7 @@ package at.jku.cis.radar.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 
 import at.jku.cis.radar.dao.EventDao;
-import at.jku.cis.radar.dao.FeatureDao;
 import at.jku.cis.radar.dao.FeatureEvoluationDao;
 import at.jku.cis.radar.model.Event;
 import at.jku.cis.radar.model.Feature;
@@ -24,19 +24,32 @@ public class FeatureEvoluationService implements Serializable {
     @Inject
     private EventDao eventDao;
     @Inject
-    private FeatureDao featureDao;
+    private FeatureService featureService;
     @Inject
     private FeatureEvoluationDao featureEvoluationDao;
 
     public List<FeatureEvoluation> findBetween(long eventId, DateTime from, DateTime to) {
         Event event = eventDao.findById(eventId);
+        if (event == null) {
+            return Collections.emptyList();
+        }
+        return findBetween(event, from, to);
+    }
+
+    private List<FeatureEvoluation> findBetween(Event event, DateTime from, DateTime to) {
         DateTime fromDate = from.minus(event.getValidationPeriod());
-        return featureEvoluationDao.findBetween(eventId, fromDate.toDate(), to.toDate());
+        return featureEvoluationDao.findBetween(event.getId(), fromDate.toDate(), to.toDate());
     }
 
     @Transactional
     public FeatureEvoluation update(long eventId, Feature feature) {
-        return save(eventId, feature);
+        Feature currentFeature = featureService.findByReference(feature.getFeatureReference());
+        if (currentFeature == null) {
+            throw new IllegalArgumentException("FeatureReference not found");
+        }
+        currentFeature.setGeometry(feature.getGeometry());
+        currentFeature.setProperties(feature.getProperties());
+        return save(eventId, currentFeature);
     }
 
     @Transactional
@@ -58,7 +71,7 @@ public class FeatureEvoluationService implements Serializable {
     }
 
     private FeatureEvoluation saveFeatureEvoluation(Feature feature, Event event, Date date) {
-        Feature createdFeature = featureDao.create(feature);
+        Feature createdFeature = featureService.save(feature);
         return featureEvoluationDao.create(createFeatureEvoluation(event, createdFeature, date));
     }
 

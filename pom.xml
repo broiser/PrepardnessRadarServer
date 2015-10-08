@@ -10,7 +10,7 @@
 		<javaee.version>7.0</javaee.version>
 		<joda-time.version>2.8.2</joda-time.version>
 		<collections.version>4.0</collections.version>
-		<jackson.version>3.0.10.Final</jackson.version>
+		<jackson.version>3.0.13.Final</jackson.version>
 		<postgis.version>1.5.2</postgis.version>
 		<postgresql.version>9.3-1101-jdbc41</postgresql.version>
 		<hibernate.version>4.3.7.Final</hibernate.version>

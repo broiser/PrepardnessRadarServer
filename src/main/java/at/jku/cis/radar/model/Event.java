@@ -11,6 +11,7 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.Period;
 
 @Entity
@@ -26,6 +27,7 @@ public class Event extends BaseEntity {
     private String name;
     private int color;
     private boolean visible;
+    @JsonIgnore
     private Period validationPeriod;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
