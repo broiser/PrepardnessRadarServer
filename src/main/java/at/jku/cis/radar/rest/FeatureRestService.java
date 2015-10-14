@@ -17,7 +17,7 @@ import org.joda.time.DateTime;
 
 import at.jku.cis.radar.model.Feature;
 import at.jku.cis.radar.model.FeatureCollection;
-import at.jku.cis.radar.model.FeatureEvoluation;
+import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvoluationService;
 import at.jku.cis.radar.transformer.FeatureEvoluation2FeatureTransformer;
 import at.jku.cis.radar.transformer.FeatureEvoluation2ReferenceTransformer;
@@ -45,7 +45,7 @@ public class FeatureRestService extends RestService {
             @PathParam("to") long to) {
         DateTime toDate = new DateTime(to);
         DateTime fromDate = new DateTime(from);
-        List<FeatureEvoluation> featureEvoluations = featureEvoluationService.findBetween(eventId, fromDate, toDate);
+        List<FeatureEvolution> featureEvoluations = featureEvoluationService.findBetween(eventId, fromDate, toDate);
         return Response.ok(buildFeatureCollection(featureEvoluations)).build();
     }
 
@@ -53,7 +53,7 @@ public class FeatureRestService extends RestService {
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response updateFeature(@PathParam("eventId") long eventId, Feature feature) {
-        FeatureEvoluation featureEvoluation = featureEvoluationService.update(eventId, feature);
+        FeatureEvolution featureEvoluation = featureEvoluationService.update(eventId, feature);
         return Response.ok(featureEvoluation2ReferenceTransformer.transform(featureEvoluation)).build();
     }
 
@@ -61,11 +61,11 @@ public class FeatureRestService extends RestService {
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
-        FeatureEvoluation featureEvoluation = featureEvoluationService.save(eventId, feature);
+        FeatureEvolution featureEvoluation = featureEvoluationService.save(eventId, feature);
         return Response.ok(featureEvoluation2ReferenceTransformer.transform(featureEvoluation)).build();
     }
 
-    private FeatureCollection buildFeatureCollection(List<FeatureEvoluation> featureEvoluations) {
+    private FeatureCollection buildFeatureCollection(List<FeatureEvolution> featureEvoluations) {
         return new FeatureCollection(CollectionUtils.collect(featureEvoluations, featureEvoluation2FeatureTransformer));
     }
 }

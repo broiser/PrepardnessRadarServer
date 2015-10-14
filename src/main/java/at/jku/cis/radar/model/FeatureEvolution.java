@@ -11,9 +11,9 @@ import javax.persistence.TemporalType;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = FeatureEvoluation.FIND_LATEST_BY_REFERENCE, query = "SELECT fe FROM FeatureEvoluation fe where fe.event.id = :eventId AND fe.feature.featureReference = :featureReference ORDER By fe.date DESC"),
-        @NamedQuery(name = FeatureEvoluation.FIND_BETWEEN_BY_EVENT, query = "SELECT fe FROM FeatureEvoluation fe WHERE fe.event.id = :eventId AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date DESC") })
-public class FeatureEvoluation extends BaseEntity {
+        @NamedQuery(name = FeatureEvolution.FIND_LATEST_BY_REFERENCE, query = "SELECT fe FROM FeatureEvolution fe where fe.event.id = :eventId AND fe.feature.featureGroup = :featureReference ORDER By fe.date DESC"),
+        @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date DESC") })
+public class FeatureEvolution extends BaseEntity {
     public static final String FIND_BETWEEN_BY_EVENT = "FeatueEvoluation.findBetweenByEvent";
     public static final String FIND_LATEST_BY_REFERENCE = "FeatureEvoluation.findLatestByReference";
 

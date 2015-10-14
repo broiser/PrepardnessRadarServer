@@ -22,7 +22,7 @@ import at.jku.cis.radar.geojson.GeometrySerializer;
 public class Feature extends BaseEntity implements GeoJsonObject {
 
     @JsonProperty(value = FEATURE_ID)
-    private String featureReference;
+    private String featureGroup;
     @JsonSerialize(using = GeometrySerializer.class)
     @JsonDeserialize(using = GeometryDeserializer.class)
     @Type(type = "org.hibernate.spatial.GeometryType")
@@ -38,12 +38,12 @@ public class Feature extends BaseEntity implements GeoJsonObject {
 
     }
 
-    public String getFeatureReference() {
-        return featureReference;
+    public String getFeatureGroup() {
+        return featureGroup;
     }
 
-    public void setFeatureReference(String featureReference) {
-        this.featureReference = featureReference;
+    public void setFeatureGroup(String featureGroup) {
+        this.featureGroup = featureGroup;
     }
 
     public Geometry getGeometry() {

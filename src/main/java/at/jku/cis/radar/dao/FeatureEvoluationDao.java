@@ -5,22 +5,22 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import at.jku.cis.radar.model.FeatureEvoluation;
+import at.jku.cis.radar.model.FeatureEvolution;
 
 @ApplicationScoped
-public class FeatureEvoluationDao extends AbstractDao<FeatureEvoluation> {
+public class FeatureEvoluationDao extends AbstractDao<FeatureEvolution> {
 
     public FeatureEvoluationDao() {
-        super(FeatureEvoluation.class);
+        super(FeatureEvolution.class);
     }
 
-    public List<FeatureEvoluation> findBetween(long eventId, Date fromDate, Date toDate) {
-        return createNamedQuery(FeatureEvoluation.FIND_BETWEEN_BY_EVENT).setParameter("eventId", eventId)
+    public List<FeatureEvolution> findBetween(long eventId, Date fromDate, Date toDate) {
+        return createNamedQuery(FeatureEvolution.FIND_BETWEEN_BY_EVENT).setParameter("eventId", eventId)
                 .setParameter("fromDate", fromDate).setParameter("toDate", toDate).getResultList();
     }
 
-    public FeatureEvoluation findLatestByReference(long eventId, String featureReference) {
-        return getSingleResult(createNamedQuery(FeatureEvoluation.FIND_LATEST_BY_REFERENCE)
+    public FeatureEvolution findLatestByReference(long eventId, String featureReference) {
+        return getSingleResult(createNamedQuery(FeatureEvolution.FIND_LATEST_BY_REFERENCE)
                 .setParameter("eventId", eventId).setParameter("featureReference", featureReference).setMaxResults(1));
     }
 }

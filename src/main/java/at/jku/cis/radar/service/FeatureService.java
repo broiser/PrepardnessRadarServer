@@ -31,8 +31,8 @@ public class FeatureService implements Serializable {
         Feature createdFeature = new Feature();
         createdFeature.setGeometry(feature.getGeometry());
         createdFeature.setProperties(feature.getProperties());
-        if (StringUtils.isEmpty(feature.getFeatureReference())) {
-            createdFeature.setFeatureReference(featureReferenceService.generateNextReference());
+        if (StringUtils.isEmpty(feature.getFeatureGroup())) {
+            createdFeature.setFeatureGroup(featureReferenceService.generateNextReference());
         }
         return createdFeature;
     }

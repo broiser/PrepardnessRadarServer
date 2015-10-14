@@ -5,13 +5,13 @@ import javax.enterprise.context.ApplicationScoped;
 import org.apache.commons.collections4.Transformer;
 
 import at.jku.cis.radar.model.Feature;
-import at.jku.cis.radar.model.FeatureEvoluation;
+import at.jku.cis.radar.model.FeatureEvolution;
 
 @ApplicationScoped
-public class FeatureEvoluation2FeatureTransformer implements Transformer<FeatureEvoluation, Feature> {
+public class FeatureEvoluation2FeatureTransformer implements Transformer<FeatureEvolution, Feature> {
 
     @Override
-    public Feature transform(FeatureEvoluation featureEvoluation) {
+    public Feature transform(FeatureEvolution featureEvoluation) {
         return featureEvoluation.getFeature();
     }
 }
