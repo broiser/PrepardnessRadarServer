@@ -41,15 +41,28 @@ public class FeatureEvoluationService implements Serializable {
         return featureEvoluationDao.findBetween(event.getId(), fromDate.toDate(), to.toDate());
     }
 
+    public FeatureEvoluation findLatestByReference(long eventId, String featureReference) {
+        return featureEvoluationDao.findLatestByReference(eventId, featureReference);
+    }
+
     @Transactional
     public FeatureEvoluation update(long eventId, Feature feature) {
-        Feature currentFeature = featureService.findByReference(feature.getFeatureReference());
-        if (currentFeature == null) {
+        FeatureEvoluation featureEvoluation = findLatestByReference(eventId, feature.getFeatureReference());
+        if (featureEvoluation == null) {
             throw new IllegalArgumentException("FeatureReference not found");
         }
+        Feature currentFeature = featureEvoluation.getFeature();
         currentFeature.setGeometry(feature.getGeometry());
         currentFeature.setProperties(feature.getProperties());
-        return save(eventId, currentFeature);
+        featureEvoluation.setFeature(featureService.save(currentFeature));
+        return featureEvoluationDao.save(featureEvoluation);
+    }
+
+    @Transactional
+    public FeatureEvoluation save(long eventId, Feature feature) {
+        Event event = eventDao.findById(eventId);
+        Date date = DateTime.now().toDate();
+        return saveFeatureEvoluation(feature, event, date);
     }
 
     @Transactional
@@ -61,13 +74,6 @@ public class FeatureEvoluationService implements Serializable {
             featureEvoluations.add(saveFeatureEvoluation(feature, event, date));
         }
         return featureEvoluations;
-    }
-
-    @Transactional
-    public FeatureEvoluation save(long eventId, Feature feature) {
-        Event event = eventDao.findById(eventId);
-        Date date = DateTime.now().toDate();
-        return saveFeatureEvoluation(feature, event, date);
     }
 
     private FeatureEvoluation saveFeatureEvoluation(Feature feature, Event event, Date date) {

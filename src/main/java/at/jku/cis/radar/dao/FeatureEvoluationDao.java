@@ -18,4 +18,9 @@ public class FeatureEvoluationDao extends AbstractDao<FeatureEvoluation> {
         return createNamedQuery(FeatureEvoluation.FIND_BETWEEN_BY_EVENT).setParameter("eventId", eventId)
                 .setParameter("fromDate", fromDate).setParameter("toDate", toDate).getResultList();
     }
+
+    public FeatureEvoluation findLatestByReference(long eventId, String featureReference) {
+        return getSingleResult(createNamedQuery(FeatureEvoluation.FIND_LATEST_BY_REFERENCE)
+                .setParameter("eventId", eventId).setParameter("featureReference", featureReference).setMaxResults(1));
+    }
 }

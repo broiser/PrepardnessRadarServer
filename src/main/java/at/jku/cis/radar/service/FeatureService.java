@@ -17,10 +17,6 @@ public class FeatureService implements Serializable {
     @Inject
     private FeatureReferenceService featureReferenceService;
 
-    public Feature findByReference(String featureReference) {
-        return featureDao.findByReference(featureReference);
-    }
-
     @Transactional
     public Feature save(Feature feature) {
         if (feature.getId() >= 1) {
