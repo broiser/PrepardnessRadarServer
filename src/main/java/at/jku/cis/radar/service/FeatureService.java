@@ -6,6 +6,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
+
 import at.jku.cis.radar.dao.FeatureDao;
 import at.jku.cis.radar.model.Feature;
 
@@ -29,7 +31,9 @@ public class FeatureService implements Serializable {
         Feature createdFeature = new Feature();
         createdFeature.setGeometry(feature.getGeometry());
         createdFeature.setProperties(feature.getProperties());
-        createdFeature.setFeatureReference(featureReferenceService.generateNextReference());
+        if (StringUtils.isEmpty(feature.getFeatureReference())) {
+            createdFeature.setFeatureReference(featureReferenceService.generateNextReference());
+        }
         return createdFeature;
     }
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -20,10 +19,7 @@ import at.jku.cis.radar.geojson.GeometryDeserializer;
 import at.jku.cis.radar.geojson.GeometrySerializer;
 
 @Entity
-@NamedQuery(name = Feature.FIND_BY_REFERENCE, query = "SELECT f FROM Feature f where f.featureReference = :featureReference")
 public class Feature extends BaseEntity implements GeoJsonObject {
-
-    public static final String FIND_BY_REFERENCE = "Feature.findByReference";
 
     @JsonProperty(value = FEATURE_ID)
     private String featureReference;

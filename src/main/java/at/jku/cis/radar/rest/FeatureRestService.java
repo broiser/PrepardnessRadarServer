@@ -8,6 +8,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -17,11 +19,11 @@ import at.jku.cis.radar.model.Feature;
 import at.jku.cis.radar.model.FeatureCollection;
 import at.jku.cis.radar.model.FeatureEvoluation;
 import at.jku.cis.radar.service.FeatureEvoluationService;
-import at.jku.cis.radar.transformer.FeatureEvoluation2ReferenceTransformer;
 import at.jku.cis.radar.transformer.FeatureEvoluation2FeatureTransformer;
+import at.jku.cis.radar.transformer.FeatureEvoluation2ReferenceTransformer;
 
 @Path("features")
-public class FeaturesRestService extends RestService {
+public class FeatureRestService extends RestService {
 
     @Inject
     private FeatureEvoluationService featureEvoluationService;
@@ -49,6 +51,7 @@ public class FeaturesRestService extends RestService {
 
     @PUT
     @Path("{eventId}")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response updateFeature(@PathParam("eventId") long eventId, Feature feature) {
         FeatureEvoluation featureEvoluation = featureEvoluationService.update(eventId, feature);
         return Response.ok(featureEvoluation2ReferenceTransformer.transform(featureEvoluation)).build();
@@ -56,18 +59,10 @@ public class FeaturesRestService extends RestService {
 
     @POST
     @Path("{eventId}")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
         FeatureEvoluation featureEvoluation = featureEvoluationService.save(eventId, feature);
-        String featureReference = featureEvoluation2ReferenceTransformer.transform(featureEvoluation);
-        return Response.ok(featureReference).build();
-    }
-
-    @POST
-    @Path("{eventId}")
-    public Response saveFeatures(@PathParam("eventId") long eventId, FeatureCollection featureCollection) {
-        List<FeatureEvoluation> featureEvoluations = featureEvoluationService.save(eventId,
-                featureCollection.getFeatures());
-        return Response.ok(CollectionUtils.collect(featureEvoluations, featureEvoluation2ReferenceTransformer)).build();
+        return Response.ok(featureEvoluation2ReferenceTransformer.transform(featureEvoluation)).build();
     }
 
     private FeatureCollection buildFeatureCollection(List<FeatureEvoluation> featureEvoluations) {
