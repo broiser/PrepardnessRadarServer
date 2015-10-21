@@ -41,8 +41,8 @@ public class FeatureEvoluationService implements Serializable {
         return featureEvoluationDao.findBetween(event.getId(), fromDate.toDate(), to.toDate());
     }
 
-    public FeatureEvolution findLatestByReference(long eventId, String featureReference) {
-        return featureEvoluationDao.findLatestByReference(eventId, featureReference);
+    public FeatureEvolution findLatestByReference(long eventId, long featureGroup) {
+        return featureEvoluationDao.findLatestByReference(eventId, featureGroup);
     }
 
     @Transactional

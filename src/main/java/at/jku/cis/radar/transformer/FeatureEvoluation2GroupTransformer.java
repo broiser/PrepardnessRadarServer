@@ -7,10 +7,10 @@ import org.apache.commons.collections4.Transformer;
 import at.jku.cis.radar.model.FeatureEvolution;
 
 @ApplicationScoped
-public class FeatureEvoluation2ReferenceTransformer implements Transformer<FeatureEvolution, String> {
+public class FeatureEvoluation2GroupTransformer implements Transformer<FeatureEvolution, Long> {
 
     @Override
-    public String transform(FeatureEvolution featureEvoluation) {
+    public Long transform(FeatureEvolution featureEvoluation) {
         return featureEvoluation.getFeature().getFeatureGroup();
     }
 }

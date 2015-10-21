@@ -46,10 +46,14 @@ public class AbstractDao<T extends BaseEntity> implements Serializable {
     }
 
     protected TypedQuery<T> createNamedQuery(String queryName) {
-        return entityManager.createNamedQuery(queryName, entityClass);
+        return createNamedQuery(queryName, entityClass);
     }
 
-    protected T getSingleResult(TypedQuery<T> typedQuery) {
+    protected <G> TypedQuery<G> createNamedQuery(String queryName, Class<G> clazz) {
+        return entityManager.createNamedQuery(queryName, clazz);
+    }
+
+    protected <G> G getSingleResult(TypedQuery<G> typedQuery) {
         try {
             return typedQuery.getSingleResult();
         } catch (NoResultException e) {

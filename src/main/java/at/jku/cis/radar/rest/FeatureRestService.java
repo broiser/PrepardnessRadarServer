@@ -20,7 +20,7 @@ import at.jku.cis.radar.model.FeatureCollection;
 import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvoluationService;
 import at.jku.cis.radar.transformer.FeatureEvoluation2FeatureTransformer;
-import at.jku.cis.radar.transformer.FeatureEvoluation2ReferenceTransformer;
+import at.jku.cis.radar.transformer.FeatureEvoluation2GroupTransformer;
 
 @Path("features")
 public class FeatureRestService extends RestService {
@@ -30,7 +30,7 @@ public class FeatureRestService extends RestService {
     @Inject
     private FeatureEvoluation2FeatureTransformer featureEvoluation2FeatureTransformer;
     @Inject
-    private FeatureEvoluation2ReferenceTransformer featureEvoluation2ReferenceTransformer;
+    private FeatureEvoluation2GroupTransformer featureEvoluation2GroupTransformer;
 
     @GET
     @Path("{eventId}")
@@ -54,7 +54,7 @@ public class FeatureRestService extends RestService {
     @Produces(MediaType.TEXT_PLAIN)
     public Response updateFeature(@PathParam("eventId") long eventId, Feature feature) {
         FeatureEvolution featureEvoluation = featureEvoluationService.update(eventId, feature);
-        return Response.ok(featureEvoluation2ReferenceTransformer.transform(featureEvoluation)).build();
+        return Response.ok(featureEvoluation2GroupTransformer.transform(featureEvoluation)).build();
     }
 
     @POST
@@ -62,7 +62,7 @@ public class FeatureRestService extends RestService {
     @Produces(MediaType.TEXT_PLAIN)
     public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
         FeatureEvolution featureEvoluation = featureEvoluationService.save(eventId, feature);
-        return Response.ok(featureEvoluation2ReferenceTransformer.transform(featureEvoluation)).build();
+        return Response.ok(featureEvoluation2GroupTransformer.transform(featureEvoluation)).build();
     }
 
     private FeatureCollection buildFeatureCollection(List<FeatureEvolution> featureEvoluations) {
