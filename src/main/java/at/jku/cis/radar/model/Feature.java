@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -20,10 +19,9 @@ import at.jku.cis.radar.geojson.GeometryDeserializer;
 import at.jku.cis.radar.geojson.GeometrySerializer;
 
 @Entity
-@NamedQuery(name = Feature.FIND_LAST_FEATURE, query = "SELECT f FROM Feature f ORDER BY f.featureGroup DESC")
 public class Feature extends BaseEntity implements GeoJsonObject {
 
-    public static final String FIND_LAST_FEATURE = "Feature.findLast";
+    public static final String FIND_LAST_FEATURE_GROUP = "Feature.findLast";
 
     @JsonProperty(value = FEATURE_ID)
     private long featureGroup;

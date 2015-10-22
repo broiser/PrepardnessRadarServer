@@ -30,7 +30,7 @@ public class FeatureService implements Serializable {
         createdFeature.setGeometry(feature.getGeometry());
         createdFeature.setProperties(feature.getProperties());
         if (feature.getFeatureGroup() <= 0) {
-            createdFeature.setFeatureGroup(featureReferenceService.generateNextReference());
+            createdFeature.setFeatureGroup(featureReferenceService.generateNextFeatureGroup());
         }
         return createdFeature;
     }

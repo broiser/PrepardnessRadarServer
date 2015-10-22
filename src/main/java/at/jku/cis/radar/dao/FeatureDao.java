@@ -10,8 +10,4 @@ public class FeatureDao extends AbstractDao<Feature> {
     public FeatureDao() {
         super(Feature.class);
     }
-
-    public Feature findLastFeature() {
-        return getSingleResult(createNamedQuery(Feature.FIND_LAST_FEATURE).setMaxResults(1));
-    }
 }

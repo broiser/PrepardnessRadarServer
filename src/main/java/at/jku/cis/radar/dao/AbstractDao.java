@@ -45,6 +45,10 @@ public class AbstractDao<T extends BaseEntity> implements Serializable {
         return entity;
     }
 
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
+
     protected TypedQuery<T> createNamedQuery(String queryName) {
         return createNamedQuery(queryName, entityClass);
     }

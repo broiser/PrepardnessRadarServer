@@ -2,34 +2,33 @@ package at.jku.cis.radar.service;
 
 import java.io.Serializable;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import at.jku.cis.radar.dao.FeatureDao;
-import at.jku.cis.radar.model.Feature;
+import at.jku.cis.radar.dao.FeatureGroupDao;
 
 @ApplicationScoped
 public class FeatureGroupService implements Serializable {
-    private static final int FIRST_FEATURE_GROUP = 1;
+    private static final long ONE = 1;
+    private static final long ZERO = 0;
 
     @Inject
-    private FeatureDao featureDao;
+    private FeatureGroupDao featureGroupDao;
 
-    private long featureGroup;
+    private Long featureGroup;
 
-    @PostConstruct
-    public void getLastFeatureGroup() {
-        Feature lastFeature = featureDao.findLastFeature();
-        // TODO Query anpassen
-        if (lastFeature == null) {
-            featureGroup = FIRST_FEATURE_GROUP;
-        } else {
-            featureGroup = lastFeature.getFeatureGroup();
+    public synchronized long generateNextFeatureGroup() {
+        if (featureGroup == null) {
+            featureGroup = loadNextFeatureGroup();
         }
+        return featureGroup++;
     }
 
-    public synchronized long generateNextReference() {
-        return featureGroup++;
+    private long loadNextFeatureGroup() {
+        Long featureGroup = featureGroupDao.findNextFeatureGroup();
+        if (featureGroup == null) {
+            featureGroup = ZERO;
+        }
+        return featureGroup + ONE;
     }
 }
