@@ -18,19 +18,19 @@ import org.joda.time.DateTime;
 import at.jku.cis.radar.model.Feature;
 import at.jku.cis.radar.model.FeatureCollection;
 import at.jku.cis.radar.model.FeatureEvolution;
-import at.jku.cis.radar.service.FeatureEvoluationService;
-import at.jku.cis.radar.transformer.FeatureEvoluation2FeatureTransformer;
-import at.jku.cis.radar.transformer.FeatureEvoluation2GroupTransformer;
+import at.jku.cis.radar.service.FeatureEvolutionService;
+import at.jku.cis.radar.transformer.FeatureEvolution2FeatureTransformer;
+import at.jku.cis.radar.transformer.FeatureEvolution2GroupTransformer;
 
 @Path("features")
 public class FeatureRestService extends RestService {
 
     @Inject
-    private FeatureEvoluationService featureEvoluationService;
+    private FeatureEvolutionService featureEvolutionService;
     @Inject
-    private FeatureEvoluation2FeatureTransformer featureEvoluation2FeatureTransformer;
+    private FeatureEvolution2FeatureTransformer featureEvolution2FeatureTransformer;
     @Inject
-    private FeatureEvoluation2GroupTransformer featureEvoluation2GroupTransformer;
+    private FeatureEvolution2GroupTransformer featureEvolution2GroupTransformer;
 
     @GET
     @Path("{eventId}")
@@ -45,27 +45,27 @@ public class FeatureRestService extends RestService {
             @PathParam("to") long to) {
         DateTime toDate = new DateTime(to);
         DateTime fromDate = new DateTime(from);
-        List<FeatureEvolution> featureEvoluations = featureEvoluationService.findBetween(eventId, fromDate, toDate);
-        return Response.ok(buildFeatureCollection(featureEvoluations)).build();
+        List<FeatureEvolution> featureEvolutions = featureEvolutionService.findBetween(eventId, fromDate, toDate);
+        return Response.ok(buildFeatureCollection(featureEvolutions)).build();
     }
 
     @PUT
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response updateFeature(@PathParam("eventId") long eventId, Feature feature) {
-        FeatureEvolution featureEvoluation = featureEvoluationService.update(eventId, feature);
-        return Response.ok(featureEvoluation2GroupTransformer.transform(featureEvoluation)).build();
+        FeatureEvolution featureEvolution = featureEvolutionService.update(eventId, feature);
+        return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
     }
 
     @POST
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
-        FeatureEvolution featureEvoluation = featureEvoluationService.save(eventId, feature);
-        return Response.ok(featureEvoluation2GroupTransformer.transform(featureEvoluation)).build();
+        FeatureEvolution featureEvolution = featureEvolutionService.save(eventId, feature);
+        return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
     }
 
-    private FeatureCollection buildFeatureCollection(List<FeatureEvolution> featureEvoluations) {
-        return new FeatureCollection(CollectionUtils.collect(featureEvoluations, featureEvoluation2FeatureTransformer));
+    private FeatureCollection buildFeatureCollection(List<FeatureEvolution> featureEvolutions) {
+        return new FeatureCollection(CollectionUtils.collect(featureEvolutions, featureEvolution2FeatureTransformer));
     }
 }

@@ -11,11 +11,13 @@ import javax.persistence.TemporalType;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = FeatureEvolution.FIND_LATEST_BY_REFERENCE, query = "SELECT fe FROM FeatureEvolution fe where fe.event.id = :eventId AND fe.feature.featureGroup = :featureReference ORDER By fe.date DESC"),
-        @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date DESC") })
+        @NamedQuery(name = FeatureEvolution.FIND_NEWEST_BY_FEATURE_GROUP, query = "SELECT fe FROM FeatureEvolution fe where fe.event.id = :eventId AND fe.feature.featureGroup = :featureGroup ORDER By fe.date DESC"),
+        @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date"),
+        @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT_AND_FEATURE_GROUP, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.feature.featureGroup = :featureGroup AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date") })
 public class FeatureEvolution extends BaseEntity {
-    public static final String FIND_BETWEEN_BY_EVENT = "FeatueEvoluation.findBetweenByEvent";
-    public static final String FIND_LATEST_BY_REFERENCE = "FeatureEvoluation.findLatestByReference";
+    public static final String FIND_NEWEST_BY_FEATURE_GROUP = "FeatureEvolution.findNewestByFeatureGroup";
+    public static final String FIND_BETWEEN_BY_EVENT = "FeatueEvolution.findBetweenByEvent";
+    public static final String FIND_BETWEEN_BY_EVENT_AND_FEATURE_GROUP = "FeatureEvolution.findBetweenByEventAndFeatureGroup";
 
     @OneToOne
     private Event event;

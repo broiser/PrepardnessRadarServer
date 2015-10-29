@@ -13,20 +13,20 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 
 import at.jku.cis.radar.dao.EventDao;
-import at.jku.cis.radar.dao.FeatureEvoluationDao;
+import at.jku.cis.radar.dao.FeatureEvolutionDao;
 import at.jku.cis.radar.model.Event;
 import at.jku.cis.radar.model.Feature;
 import at.jku.cis.radar.model.FeatureEvolution;
 
 @ApplicationScoped
-public class FeatureEvoluationService implements Serializable {
+public class FeatureEvolutionService implements Serializable {
 
     @Inject
     private EventDao eventDao;
     @Inject
     private FeatureService featureService;
     @Inject
-    private FeatureEvoluationDao featureEvoluationDao;
+    private FeatureEvolutionDao featureEvolutionDao;
 
     public List<FeatureEvolution> findBetween(long eventId, DateTime from, DateTime to) {
         Event event = eventDao.findById(eventId);
@@ -38,54 +38,59 @@ public class FeatureEvoluationService implements Serializable {
 
     private List<FeatureEvolution> findBetween(Event event, DateTime from, DateTime to) {
         DateTime fromDate = from.minus(event.getValidationPeriod());
-        return featureEvoluationDao.findBetween(event.getId(), fromDate.toDate(), to.toDate());
+        return featureEvolutionDao.findBetween(event.getId(), fromDate.toDate(), to.toDate());
     }
 
-    public FeatureEvolution findLatestByReference(long eventId, long featureGroup) {
-        return featureEvoluationDao.findLatestByReference(eventId, featureGroup);
+    public List<FeatureEvolution> findBetween(long eventId, long featureGroup, DateTime fromDate, DateTime toDate) {
+        return featureEvolutionDao.findBetween(eventId, featureGroup, fromDate.toDate(), toDate.toDate());
     }
 
     @Transactional
     public FeatureEvolution update(long eventId, Feature feature) {
-        FeatureEvolution featureEvoluation = findLatestByReference(eventId, feature.getFeatureGroup());
-        if (featureEvoluation == null) {
-            throw new IllegalArgumentException("FeatureReference not found");
+        FeatureEvolution featureEvolution = findNewestByFeatureGroup(eventId, feature.getFeatureGroup());
+        if (featureEvolution == null) {
+            throw new IllegalArgumentException("FeatureGroup not found");
         }
-        Feature currentFeature = featureEvoluation.getFeature();
+        Feature currentFeature = featureEvolution.getFeature();
         currentFeature.setGeometry(feature.getGeometry());
         currentFeature.setProperties(feature.getProperties());
-        featureEvoluation.setFeature(featureService.save(currentFeature));
-        return featureEvoluationDao.save(featureEvoluation);
+        featureEvolution.setFeature(featureService.save(currentFeature));
+        return featureEvolutionDao.save(featureEvolution);
     }
 
     @Transactional
     public FeatureEvolution save(long eventId, Feature feature) {
         Event event = eventDao.findById(eventId);
         Date date = DateTime.now().toDate();
-        return saveFeatureEvoluation(feature, event, date);
+        return saveFeatureEvolution(feature, event, date);
     }
 
     @Transactional
     public List<FeatureEvolution> save(long eventId, List<Feature> features) {
         Event event = eventDao.findById(eventId);
         Date date = DateTime.now().toDate();
-        List<FeatureEvolution> featureEvoluations = new ArrayList<>();
+        List<FeatureEvolution> featureEvolutions = new ArrayList<>();
         for (Feature feature : features) {
-            featureEvoluations.add(saveFeatureEvoluation(feature, event, date));
+            featureEvolutions.add(saveFeatureEvolution(feature, event, date));
         }
-        return featureEvoluations;
+        return featureEvolutions;
     }
 
-    private FeatureEvolution saveFeatureEvoluation(Feature feature, Event event, Date date) {
+    private FeatureEvolution findNewestByFeatureGroup(long eventId, long featureGroup) {
+        return featureEvolutionDao.findNewestByFeatureGroup(eventId, featureGroup);
+    }
+
+    private FeatureEvolution saveFeatureEvolution(Feature feature, Event event, Date date) {
         Feature createdFeature = featureService.save(feature);
-        return featureEvoluationDao.create(createFeatureEvoluation(event, createdFeature, date));
+        return featureEvolutionDao.create(createFeatureEvolution(event, createdFeature, date));
     }
 
-    private FeatureEvolution createFeatureEvoluation(Event event, Feature feature, Date date) {
-        FeatureEvolution featureEvoluation = new FeatureEvolution();
-        featureEvoluation.setDate(date);
-        featureEvoluation.setEvent(event);
-        featureEvoluation.setFeature(feature);
-        return featureEvoluation;
+    private FeatureEvolution createFeatureEvolution(Event event, Feature feature, Date date) {
+        FeatureEvolution featureEvolution = new FeatureEvolution();
+        featureEvolution.setDate(date);
+        featureEvolution.setEvent(event);
+        featureEvolution.setFeature(feature);
+        return featureEvolution;
     }
+
 }
