@@ -23,6 +23,14 @@ import com.vividsolutions.jts.geom.Geometry;
         @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date"),
         @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT_AND_FEATURE_GROUP, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.featureGroup = :featureGroup AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date") })
 public class FeatureEvolution extends BaseEntity {
+    // SELECT fe.id, fe.date, fe.featuregroup, fe.geometry, fe.event_id
+    // FROM (
+    //         SELECT featuregroup, MAX(date) as maxdate
+    //         FROM public.featureevolution
+    //         GROUP By featureGroup
+    // ) r
+    // INNER JOIN public.featureevolution fe ON fe.featuregroup = r.featuregroup AND fe.date = r.maxdate;
+    
     public static final String FIND_NEWEST_BY_FEATURE_GROUP = "FeatureEvolution.findNewestByFeatureGroup";
     public static final String FIND_BETWEEN_BY_EVENT = "FeatueEvolution.findBetweenByEvent";
     public static final String FIND_BETWEEN_BY_EVENT_AND_FEATURE_GROUP = "FeatureEvolution.findBetweenByEventAndFeatureGroup";
