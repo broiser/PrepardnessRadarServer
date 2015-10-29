@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-import at.jku.cis.radar.model.Feature;
+import at.jku.cis.radar.geojson.Feature;
 import at.jku.cis.radar.model.FeatureEvolution;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,7 +44,7 @@ public class FeatureEvolutionPreparerTest {
         List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
                 createFeatureEvolution(date, createPolygon()));
         Map<Date, List<Feature>> result = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
-        assertEquals(featureEvolutions.get(0).getFeature(), result.get(date).get(0));
+        assertEquals(featureEvolutions.get(0).getGeometry(), result.get(date).get(0).getGeometry());
     }
 
     @Test
@@ -73,10 +73,8 @@ public class FeatureEvolutionPreparerTest {
     private FeatureEvolution createFeatureEvolution(Date date, Geometry geometry) {
         FeatureEvolution featureEvolution = new FeatureEvolution();
         featureEvolution.setDate(date);
-        Feature feature = new Feature();
-        feature.setGeometry(createGeometryCollection(geometry));
-        feature.setFeatureGroup(FEATURE_GROUP);
-        featureEvolution.setFeature(feature);
+        featureEvolution.setFeatureGroup(FEATURE_GROUP);
+        featureEvolution.setGeometry(createGeometryCollection(geometry));
         return featureEvolution;
     }
 

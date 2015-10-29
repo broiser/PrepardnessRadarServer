@@ -15,8 +15,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
 
-import at.jku.cis.radar.model.Feature;
-import at.jku.cis.radar.model.FeatureCollection;
+import at.jku.cis.radar.geojson.Feature;
+import at.jku.cis.radar.geojson.FeatureCollection;
 import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvolutionService;
 import at.jku.cis.radar.transformer.FeatureEvolution2FeatureTransformer;
@@ -52,16 +52,16 @@ public class FeatureRestService extends RestService {
     @PUT
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response updateFeature(@PathParam("eventId") long eventId, Feature feature) {
-        FeatureEvolution featureEvolution = featureEvolutionService.update(eventId, feature);
+    public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
+        FeatureEvolution featureEvolution = featureEvolutionService.save(eventId, feature);
         return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
     }
 
     @POST
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
-        FeatureEvolution featureEvolution = featureEvolutionService.save(eventId, feature);
+    public Response createFeature(@PathParam("eventId") long eventId, Feature feature) {
+        FeatureEvolution featureEvolution = featureEvolutionService.create(eventId, feature);
         return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
     }
 

@@ -7,7 +7,6 @@
 		<jta-data-source>java:jboss/datasources/crowdSA</jta-data-source>
 		<class>at.jku.cis.radar.model.Event</class>
 		<class>at.jku.cis.radar.model.Action</class>
-		<class>at.jku.cis.radar.model.Feature</class>
 		<class>at.jku.cis.radar.model.FeatureEvolution</class>
 		<class>at.jku.cis.radar.model.BaseEntity</class>
 

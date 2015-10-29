@@ -1,10 +1,8 @@
-package at.jku.cis.radar.model;
+package at.jku.cis.radar.geojson;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import at.jku.cis.radar.geojson.GeoJsonObject;
 
 public class FeatureCollection implements GeoJsonObject {
 

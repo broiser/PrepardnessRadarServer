@@ -7,9 +7,6 @@ import org.codehaus.jackson.annotate.JsonSubTypes.Type;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
 
-import at.jku.cis.radar.model.Feature;
-import at.jku.cis.radar.model.FeatureCollection;
-
 @JsonTypeInfo(property = GeoJsonObject.TYPE, use = Id.NAME)
 @JsonSubTypes({ @Type(FeatureCollection.class), @Type(Feature.class) })
 public interface GeoJsonObject extends Serializable {

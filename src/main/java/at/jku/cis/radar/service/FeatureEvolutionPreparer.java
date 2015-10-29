@@ -9,15 +9,20 @@ import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 
-import at.jku.cis.radar.model.Feature;
+import at.jku.cis.radar.geojson.Feature;
 import at.jku.cis.radar.model.FeatureEvolution;
+import at.jku.cis.radar.transformer.FeatureEvolution2FeatureTransformer;
 
 @ApplicationScoped
 public class FeatureEvolutionPreparer implements Serializable {
+
+    @Inject
+    private FeatureEvolution2FeatureTransformer featureEvolution2FeatureTransformer;
 
     public Map<Date, List<Feature>> prepareEvolution(List<FeatureEvolution> featureEvolutions) {
         if (featureEvolutions.isEmpty()) {
@@ -26,12 +31,12 @@ public class FeatureEvolutionPreparer implements Serializable {
 
         Map<Date, List<Feature>> date2Feature = new HashMap<>();
         FeatureEvolution featureEvolution = featureEvolutions.get(featureEvolutions.size() - 1);
-        List<Feature> lastFeatures = Arrays.asList(featureEvolution.getFeature());
+        List<Feature> lastFeatures = Arrays.asList(transformToFeature(featureEvolution));
 
         date2Feature.put(featureEvolution.getDate(), lastFeatures);
         for (int i = featureEvolutions.size() - 2; i >= 0; i--) {
             FeatureEvolution currentEvolution = featureEvolutions.get(i);
-            Feature currentFeature = currentEvolution.getFeature();
+            Feature currentFeature = transformToFeature(currentEvolution);
             date2Feature.put(currentEvolution.getDate(), prepareEvolution(lastFeatures, currentFeature));
         }
         return date2Feature;
@@ -59,6 +64,10 @@ public class FeatureEvolutionPreparer implements Serializable {
             }
         }
         return new ArrayList<>();
+    }
+
+    private Feature transformToFeature(FeatureEvolution featureEvolution) {
+        return featureEvolution2FeatureTransformer.transform(featureEvolution);
     }
 
     private GeometryCollection extractGeometryCollection(Feature feature) {
