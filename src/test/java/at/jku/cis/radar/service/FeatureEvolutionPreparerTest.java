@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -39,24 +38,33 @@ public class FeatureEvolutionPreparerTest {
     private FeatureEvolutionPreparer featureEvolutionPreparer;
 
     @Test
-    public void singleFeatureEvolutionIsPreparedAsMap() {
-        Date date = toDate(12, 00);
+    public void singleFeatureIsPreparedFromGeometryCollectionWithOnePolygon() {
+        Polygon polygon = createPolygon();
         List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
-                createFeatureEvolution(date, createPolygon()));
-        Map<Date, List<Feature>> result = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
-        assertEquals(featureEvolutions.get(0).getGeometry(), result.get(date).get(0).getGeometry());
+                createFeatureEvolution(toDate(12, 00), polygon));
+        List<Feature> features = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
+        assertEquals(polygon, features.get(0).getGeometry());
     }
 
     @Test
-    public void twoFeatureEvolutionWithIntersectionArePreparedAsMap() {
-        Date date = toDate(13, 00);
+    public void twoFeatureArePreparedFromGeometryCollectionWithTwoPolygons() {
+        Polygon polygon = createPolygon();
         List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
-                createFeatureEvolution(toDate(12, 00), toCoordinate(10, 10), toCoordinate(10, 15), toCoordinate(15, 15),
-                        toCoordinate(15, 10)),
-                createFeatureEvolution(date, toCoordinate(10, 10), toCoordinate(10, 12), toCoordinate(12, 12),
-                        toCoordinate(12, 10)));
-        Map<Date, List<Feature>> result = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
-        assertEquals("", result.get(date).get(0).getGeometry());
+                createFeatureEvolution(toDate(12, 00), polygon, polygon));
+        List<Feature> features = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
+        assertEquals(polygon, features.get(0).getGeometry());
+    }
+
+    @Test
+    public void twoFeatureArePreparedFromTwoGeometryCollectionWithOnePolygon() {
+        List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
+                createFeatureEvolution(toDate(11, 00), toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10)),
+                createFeatureEvolution(toDate(12, 00), toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10),
+                        toCoordinate(0, 10)));
+        List<Feature> features = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
+        assertEquals(2, features.size());
+        assertEquals("POLYGON ((0 0, 0 10, 10 10, 0 0))", features.get(0).getGeometry().toString());
+        assertEquals("POLYGON ((0 0, 10 0, 10 10, 0 0))", features.get(1).getGeometry().toString());
     }
 
     private List<FeatureEvolution> mockFeatureEvolutionService(FeatureEvolution... featureEvolutionArray) {
@@ -70,16 +78,16 @@ public class FeatureEvolutionPreparerTest {
         return createFeatureEvolution(date, createPolygon(coordinates));
     }
 
-    private FeatureEvolution createFeatureEvolution(Date date, Geometry geometry) {
+    private FeatureEvolution createFeatureEvolution(Date date, Geometry... geometries) {
         FeatureEvolution featureEvolution = new FeatureEvolution();
         featureEvolution.setDate(date);
         featureEvolution.setFeatureGroup(FEATURE_GROUP);
-        featureEvolution.setGeometry(createGeometryCollection(geometry));
+        featureEvolution.setGeometry(createGeometryCollection(geometries));
         return featureEvolution;
     }
 
-    private GeometryCollection createGeometryCollection(Geometry geometry) {
-        return new GeometryCollection(new Geometry[] { geometry }, geometry.getFactory());
+    private GeometryCollection createGeometryCollection(Geometry[] geometries) {
+        return new GeometryCollection(geometries, geometries[0].getFactory());
     }
 
     private Polygon createPolygon(Coordinate... coordinateArray) {

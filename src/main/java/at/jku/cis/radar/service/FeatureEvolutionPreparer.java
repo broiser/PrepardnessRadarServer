@@ -2,75 +2,78 @@ package at.jku.cis.radar.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 
+import at.jku.cis.radar.builder.FeatureBuilder;
 import at.jku.cis.radar.geojson.Feature;
 import at.jku.cis.radar.model.FeatureEvolution;
-import at.jku.cis.radar.transformer.FeatureEvolution2FeatureTransformer;
 
 @ApplicationScoped
 public class FeatureEvolutionPreparer implements Serializable {
 
-    @Inject
-    private FeatureEvolution2FeatureTransformer featureEvolution2FeatureTransformer;
-
-    public Map<Date, List<Feature>> prepareEvolution(List<FeatureEvolution> featureEvolutions) {
+    public List<Feature> prepareEvolution(List<FeatureEvolution> featureEvolutions) {
         if (featureEvolutions.isEmpty()) {
-            return new HashMap<>();
+            return Collections.emptyList();
         }
-
-        Map<Date, List<Feature>> date2Feature = new HashMap<>();
-        FeatureEvolution featureEvolution = featureEvolutions.get(featureEvolutions.size() - 1);
-        List<Feature> lastFeatures = Arrays.asList(transformToFeature(featureEvolution));
-
-        date2Feature.put(featureEvolution.getDate(), lastFeatures);
-        for (int i = featureEvolutions.size() - 2; i >= 0; i--) {
-            FeatureEvolution currentEvolution = featureEvolutions.get(i);
-            Feature currentFeature = transformToFeature(currentEvolution);
-            date2Feature.put(currentEvolution.getDate(), prepareEvolution(lastFeatures, currentFeature));
-        }
-        return date2Feature;
+        return createFeatureEvolution(featureEvolutions);
     }
 
-    private List<Feature> prepareEvolution(List<Feature> lastFeatures, Feature currentFeature) {
+    private List<Feature> createFeatureEvolution(List<FeatureEvolution> featureEvolutions) {
         List<Feature> features = new ArrayList<>();
-        for (Feature lastFeature : lastFeatures) {
-            features.addAll(prepareEvolution(currentFeature, lastFeature));
+
+        for (int i = featureEvolutions.size() - 1; i >= 0; i--) {
+            FeatureEvolution featureEvolution = featureEvolutions.get(i);
+            features = createFeatureEvolution(features, featureEvolution);
+        }
+
+        return features;
+    }
+
+    private List<Feature> createFeatureEvolution(List<Feature> currentFeatures, FeatureEvolution featureEvolution) {
+        List<Feature> features = new ArrayList<>();
+        long featureGroup = featureEvolution.getFeatureGroup();
+        Map<String, Object> properties = featureEvolution.getProperties();
+        GeometryCollection geometryCollection = (GeometryCollection) featureEvolution.getGeometry();
+
+        for (int n = 0; n < geometryCollection.getNumGeometries(); n++) {
+            Geometry geometry = geometryCollection.getGeometryN(n);
+
+            if (currentFeatures.isEmpty()) {
+                features.add(buildFeature(featureGroup, geometry, properties));
+            } else {
+                for (Feature currentFeature : currentFeatures) {
+                    features.addAll(intersectFeature(currentFeature, geometry));
+                }
+            }
         }
         return features;
     }
 
-    @SuppressWarnings("unused")
-    private List<Feature> prepareEvolution(Feature currentFeature, Feature lastFeature) {
-        GeometryCollection lastGeometryCollection = extractGeometryCollection(lastFeature);
-        GeometryCollection currentGeometryCollection = extractGeometryCollection(currentFeature);
-        for (int i = 0; i < lastGeometryCollection.getNumGeometries(); i++) {
-            Geometry lastGeometry = lastGeometryCollection.getGeometryN(i);
-            for (int j = 0; j < currentGeometryCollection.getNumGeometries(); j++) {
-                Geometry currentGeometry = currentGeometryCollection.getGeometryN(j);
-                if (lastGeometry.intersects(currentGeometry)) {
-                    Geometry geometry = currentGeometry.difference(lastGeometry);
-                }
-            }
+    private List<Feature> intersectFeature(Feature feature, Geometry geometry) {
+        List<Feature> features = new ArrayList<>();
+
+        Map<String, Object> properties = feature.getProperties();
+        long featureGroup = feature.getFeatureGroup();
+
+        if (feature.getGeometry().disjoint(geometry)) {
+            features.add(feature);
+        } else {
+            Geometry newGeometry = feature.getGeometry().difference(geometry);
+            features.add(buildFeature(featureGroup, newGeometry, properties));
+            features.add(buildFeature(featureGroup, geometry, properties));
         }
-        return new ArrayList<>();
+        return features;
     }
 
-    private Feature transformToFeature(FeatureEvolution featureEvolution) {
-        return featureEvolution2FeatureTransformer.transform(featureEvolution);
-    }
-
-    private GeometryCollection extractGeometryCollection(Feature feature) {
-        return (GeometryCollection) feature.getGeometry();
+    private Feature buildFeature(long featureGroup, Geometry geometry, Map<String, Object> properties) {
+        FeatureBuilder featureBuilder = new FeatureBuilder().withFeatureGroup(featureGroup);
+        return featureBuilder.withGeometry(geometry).withProperties(properties).build();
     }
 }
