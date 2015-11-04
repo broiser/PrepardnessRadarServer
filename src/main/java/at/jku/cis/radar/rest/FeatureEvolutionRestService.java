@@ -14,7 +14,7 @@ import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvolutionPreparer;
 import at.jku.cis.radar.service.FeatureEvolutionService;
 
-@Path("featureEvolution")
+@Path("featureEvolutions")
 public class FeatureEvolutionRestService extends RestService {
 
     @Inject
@@ -26,7 +26,7 @@ public class FeatureEvolutionRestService extends RestService {
     @Path("{eventId}/{featureGroup}")
     public Response getFeatureEvolution(@PathParam("eventId") long eventId,
             @PathParam("featureGroup") long featureGroup) {
-        DateTime dateTime = DateTime.now().withTimeAtStartOfDay();
+        DateTime dateTime = DateTime.now().withTimeAtStartOfDay().minusDays(1);
         long from = dateTime.getMillis();
         long to = dateTime.plusDays(1).getMillis();
         return getFeatureEvolution(eventId, featureGroup, from, to);
