@@ -14,7 +14,7 @@ import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvolutionPreparer;
 import at.jku.cis.radar.service.FeatureEvolutionService;
 
-@Path("featureEvolution")
+@Path("featureEvolutions")
 public class FeatureEvolutionRestService extends RestService {
 
     @Inject

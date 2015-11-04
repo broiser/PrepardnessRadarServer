@@ -9,7 +9,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Feature implements GeoJsonObject {
+public class GeoJsonFeature implements GeoJsonObject {
 
     @JsonProperty(value = FEATURE_ID)
     private long featureGroup;
@@ -18,7 +18,7 @@ public class Feature implements GeoJsonObject {
     private Geometry geometry;
     private Map<String, Object> properties = new HashMap<String, Object>();
 
-    public Feature() {
+    public GeoJsonFeature() {
     }
 
     public long getFeatureGroup() {
