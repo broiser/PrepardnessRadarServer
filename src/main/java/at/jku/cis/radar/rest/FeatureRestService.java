@@ -45,7 +45,7 @@ public class FeatureRestService extends RestService {
             @PathParam("to") long to) {
         DateTime toDate = new DateTime(to);
         DateTime fromDate = new DateTime(from);
-        List<FeatureEvolution> featureEvolutions = featureEvolutionService.findBetween(eventId, fromDate, toDate);
+        List<FeatureEvolution> featureEvolutions = featureEvolutionService.findNewestByEvent(eventId, fromDate, toDate);
         return Response.ok(buildFeatureCollection(featureEvolutions)).build();
     }
 
