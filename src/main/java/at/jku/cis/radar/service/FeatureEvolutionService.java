@@ -46,30 +46,30 @@ public class FeatureEvolutionService implements Serializable {
     }
 
     @Transactional
-    public FeatureEvolution save(long eventId, Feature geoJsonFeature) {
-        FeatureEvolution featureEvolution = findNewestByFeatureGroup(eventId, geoJsonFeature.getFeatureGroup());
+    public FeatureEvolution save(long eventId, Feature feature) {
+        FeatureEvolution featureEvolution = findNewestByFeatureGroup(eventId, feature.getFeatureGroup());
         if (featureEvolution == null) {
             throw new IllegalArgumentException("FeatureGroup not found");
         }
-        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
-        featureEvolution.setProperties(geoJsonFeature.getProperties());
+        featureEvolution.setGeometry(feature.getGeometry());
+        featureEvolution.setProperties(feature.getProperties());
         return featureEvolutionDao.save(featureEvolution);
     }
 
     @Transactional
-    public FeatureEvolution create(long eventId, Feature geoJsonFeature) {
+    public FeatureEvolution create(long eventId, Feature feature) {
         Event event = eventDao.findById(eventId);
         Date date = DateTime.now().toDate();
-        return createFeatureEvolution(geoJsonFeature, event, date);
+        return createFeatureEvolution(feature, event, date);
     }
 
     @Transactional
-    public List<FeatureEvolution> save(long eventId, List<Feature> geoJsonFeatures) {
+    public List<FeatureEvolution> save(long eventId, List<Feature> features) {
         Event event = eventDao.findById(eventId);
         Date date = DateTime.now().toDate();
         List<FeatureEvolution> featureEvolutions = new ArrayList<>();
-        for (Feature geoJsonFeature : geoJsonFeatures) {
-            featureEvolutions.add(createFeatureEvolution(geoJsonFeature, event, date));
+        for (Feature feature : features) {
+            featureEvolutions.add(createFeatureEvolution(feature, event, date));
         }
         return featureEvolutions;
     }
@@ -78,19 +78,21 @@ public class FeatureEvolutionService implements Serializable {
         return featureEvolutionDao.findNewestByFeatureGroup(eventId, featureGroup);
     }
 
-    private FeatureEvolution createFeatureEvolution(Feature geoJsonFeature, Event event, Date date) {
-        FeatureEvolution featureEvolution = buildFeatureEvolution(geoJsonFeature, event, date);
+    private FeatureEvolution createFeatureEvolution(Feature feature, Event event, Date date) {
+        FeatureEvolution featureEvolution = buildFeatureEvolution(feature, event, date);
         return featureEvolutionDao.create(featureEvolution);
     }
 
-    private FeatureEvolution buildFeatureEvolution(Feature geoJsonFeature, Event event, Date date) {
+    private FeatureEvolution buildFeatureEvolution(Feature feature, Event event, Date date) {
         FeatureEvolution featureEvolution = new FeatureEvolution();
         featureEvolution.setDate(date);
         featureEvolution.setEvent(event);
-        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
-        featureEvolution.setProperties(geoJsonFeature.getProperties());
-        if (geoJsonFeature.getFeatureGroup() <= 0) {
+        featureEvolution.setGeometry(feature.getGeometry());
+        featureEvolution.setProperties(feature.getProperties());
+        if (feature.getFeatureGroup() <= 0) {
             featureEvolution.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
+        } else{
+        	featureEvolution.setFeatureGroup(feature.getFeatureGroup());
         }
         return featureEvolution;
     }

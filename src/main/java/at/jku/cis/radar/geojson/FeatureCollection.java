@@ -6,24 +6,24 @@ import java.util.List;
 
 public class FeatureCollection implements GeoJsonObject {
 
-    private List<Feature> geoJsonFeatures = new ArrayList<Feature>();
+    private List<Feature> features = new ArrayList<Feature>();
 
     public FeatureCollection() {
     }
 
-    public FeatureCollection(Feature geoJsonFeature) {
-        this.geoJsonFeatures.add(geoJsonFeature);
+    public FeatureCollection(Feature feature) {
+        this.features.add(feature);
     }
 
-    public FeatureCollection(Collection<Feature> geoJsonFeatures) {
-        this.geoJsonFeatures.addAll(geoJsonFeatures);
+    public FeatureCollection(Collection<Feature> features) {
+        this.features.addAll(features);
     }
 
     public List<Feature> getFeatures() {
-        return geoJsonFeatures;
+        return features;
     }
 
-    public void setFeatures(List<Feature> geoJsonFeatures) {
-        this.geoJsonFeatures = geoJsonFeatures;
+    public void setFeatures(List<Feature> features) {
+        this.features = features;
     }
 }

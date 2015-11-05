@@ -19,54 +19,53 @@ import at.jku.cis.radar.geojson.Feature;
 import at.jku.cis.radar.geojson.FeatureCollection;
 import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvolutionService;
-import at.jku.cis.radar.transformer.FeatureEvolution2GeoJsonFeatureTransformer;
+import at.jku.cis.radar.transformer.FeatureEvolution2FeatureTransformer;
 import at.jku.cis.radar.transformer.FeatureEvolution2GroupTransformer;
 
 @Path("features")
 public class FeatureRestService extends RestService {
 
-	@Inject
-	private FeatureEvolutionService featureEvolutionService;
-	@Inject
-	private FeatureEvolution2GroupTransformer featureEvolution2GroupTransformer;
-	@Inject
-	private FeatureEvolution2GeoJsonFeatureTransformer featureEvolution2GeoJsonFeatureTransformer;
+    @Inject
+    private FeatureEvolutionService featureEvolutionService;
+    @Inject
+    private FeatureEvolution2FeatureTransformer featureEvolution2FeatureTransformer;
+    @Inject
+    private FeatureEvolution2GroupTransformer featureEvolution2GroupTransformer;
 
-	@GET
-	@Path("{eventId}")
-	public Response getFeatures(@PathParam("eventId") long eventId) {
-		long currentMillis = DateTime.now().getMillis();
-		return getFeatures(eventId, currentMillis, currentMillis);
-	}
+    @GET
+    @Path("{eventId}")
+    public Response getFeatures(@PathParam("eventId") long eventId) {
+        long currentMillis = DateTime.now().getMillis();
+        return getFeatures(eventId, currentMillis, currentMillis);
+    }
 
-	@GET
-	@Path("{eventId}/{from}/{to}")
-	public Response getFeatures(@PathParam("eventId") long eventId, @PathParam("from") long from,
-			@PathParam("to") long to) {
-		DateTime toDate = new DateTime(to);
-		DateTime fromDate = new DateTime(from);
-		List<FeatureEvolution> featureEvolutions = featureEvolutionService.findNewestByEvent(eventId, fromDate, toDate);
-		return Response.ok(buildGeoJsonFeatureCollection(featureEvolutions)).build();
-	}
+    @GET
+    @Path("{eventId}/{from}/{to}")
+    public Response getFeatures(@PathParam("eventId") long eventId, @PathParam("from") long from,
+            @PathParam("to") long to) {
+        DateTime toDate = new DateTime(to);
+        DateTime fromDate = new DateTime(from);
+        List<FeatureEvolution> featureEvolutions = featureEvolutionService.findNewestByEvent(eventId, fromDate, toDate);
+        return Response.ok(buildFeatureCollection(featureEvolutions)).build();
+    }
 
-	@PUT
-	@Path("{eventId}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response saveFeature(@PathParam("eventId") long eventId, Feature geoJsonFeature) {
-		FeatureEvolution featureEvolution = featureEvolutionService.save(eventId, geoJsonFeature);
-		return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
-	}
+    @PUT
+    @Path("{eventId}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response saveFeature(@PathParam("eventId") long eventId, Feature feature) {
+        FeatureEvolution featureEvolution = featureEvolutionService.save(eventId, feature);
+        return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
+    }
 
-	@POST
-	@Path("{eventId}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response createFeature(@PathParam("eventId") long eventId, Feature geoJsonFeature) {
-		FeatureEvolution featureEvolution = featureEvolutionService.create(eventId, geoJsonFeature);
-		return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
-	}
+    @POST
+    @Path("{eventId}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response createFeature(@PathParam("eventId") long eventId, Feature feature) {
+        FeatureEvolution featureEvolution = featureEvolutionService.create(eventId, feature);
+        return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
+    }
 
-	private FeatureCollection buildGeoJsonFeatureCollection(List<FeatureEvolution> featureEvolutions) {
-		return new FeatureCollection(
-				CollectionUtils.collect(featureEvolutions, featureEvolution2GeoJsonFeatureTransformer));
-	}
+    private FeatureCollection buildFeatureCollection(List<FeatureEvolution> featureEvolutions) {
+        return new FeatureCollection(CollectionUtils.collect(featureEvolutions, featureEvolution2FeatureTransformer));
+    }
 }
