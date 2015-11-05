@@ -1,9 +1,9 @@
 package at.jku.cis.radar.service;
 
+import static at.jku.cis.radar.geojson.GeoJsonStatus.CREATED;
+import static at.jku.cis.radar.geojson.GeoJsonStatus.EARSED;
+//github.com/broiser/PreparednessRadarServer.git
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -13,7 +13,6 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -22,56 +21,94 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-import at.jku.cis.radar.geojson.Feature;
+import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
+import at.jku.cis.radar.geojson.GeoJsonStatus;
 import at.jku.cis.radar.model.FeatureEvolution;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FeatureEvolutionPreparerTest {
 
-    private static final int EVENT_ID = 15;
     private static final int FEATURE_GROUP = 10;
-
-    @Mock
-    private FeatureEvolutionService featureEvolutionService;
 
     @InjectMocks
     private FeatureEvolutionPreparer featureEvolutionPreparer;
 
     @Test
-    public void singleFeatureIsPreparedFromGeometryCollectionWithOnePolygon() {
+    public void singleFeatureIsCreatedFromGeometryCollectionWithOnePolygon() {
+        Date date = toDate(12, 00);
         Polygon polygon = createPolygon();
-        List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
-                createFeatureEvolution(toDate(12, 00), polygon));
-        List<Feature> features = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
-        assertEquals(polygon, features.get(0).getGeometry());
+        List<FeatureEvolution> featureEvolutions = Arrays.asList(createFeatureEvolution(date, polygon));
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(featureEvolutions);
+        assertEvolutionEquals(date, CREATED, polygon, geoJsonFeatureEvolutions.get(0));
     }
 
     @Test
-    public void twoFeatureArePreparedFromGeometryCollectionWithTwoPolygons() {
+    public void twoFeatureAreCreatedFromGeometryCollectionWithTwoPolygons() {
+        Date date = toDate(12, 00);
         Polygon polygon = createPolygon();
-        List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
-                createFeatureEvolution(toDate(12, 00), polygon, polygon));
-        List<Feature> features = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
-        assertEquals(polygon, features.get(0).getGeometry());
+        List<FeatureEvolution> featureEvolutions = Arrays.asList(createFeatureEvolution(date, polygon, polygon));
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(featureEvolutions);
+        assertEvolutionEquals(date, CREATED, polygon, geoJsonFeatureEvolutions.get(0));
+        assertEvolutionEquals(date, CREATED, polygon, geoJsonFeatureEvolutions.get(1));
     }
 
     @Test
-    public void twoFeatureArePreparedFromTwoGeometryCollectionWithOnePolygon() {
-        List<FeatureEvolution> featureEvolutions = mockFeatureEvolutionService(
-                createFeatureEvolution(toDate(11, 00), toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10)),
-                createFeatureEvolution(toDate(12, 00), toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10),
+    public void twoFeatureAreCreatedFromTwoGeometryCollectionWithOnePolygon() {
+        Date firstDate = toDate(11, 00);
+        Date secondDate = toDate(12, 00);
+        List<FeatureEvolution> featureEvolutions = Arrays.asList(
+                createFeatureEvolution(firstDate, toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10)),
+                createFeatureEvolution(secondDate, toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10),
                         toCoordinate(0, 10)));
-        List<Feature> features = featureEvolutionPreparer.prepareEvolution(featureEvolutions);
-        assertEquals(2, features.size());
-        assertEquals("POLYGON ((0 0, 0 10, 10 10, 0 0))", features.get(0).getGeometry().toString());
-        assertEquals("POLYGON ((0 0, 10 0, 10 10, 0 0))", features.get(1).getGeometry().toString());
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(featureEvolutions);
+        assertEquals(2, geoJsonFeatureEvolutions.size());
+        assertEvolutionEquals(firstDate, CREATED, "POLYGON ((0 0, 10 0, 10 10, 0 0))", geoJsonFeatureEvolutions.get(0));
+        assertEvolutionEquals(secondDate, CREATED, "POLYGON ((0 0, 0 10, 10 10, 0 0))",
+                geoJsonFeatureEvolutions.get(1));
     }
 
-    private List<FeatureEvolution> mockFeatureEvolutionService(FeatureEvolution... featureEvolutionArray) {
-        List<FeatureEvolution> featureEvolutions = Arrays.asList(featureEvolutionArray);
-        when(featureEvolutionService.findBetween(eq(EVENT_ID), eq(FEATURE_GROUP), any(DateTime.class),
-                any(DateTime.class))).thenReturn(featureEvolutions);
-        return featureEvolutions;
+    @Test
+    public void oneFeatureIsCreatedAndOneFeatureIsEarsedFromTwoGeometryCollectionWithOnePolygon() {
+        Date firstDate = toDate(11, 00);
+        Date secondDate = toDate(12, 00);
+        List<FeatureEvolution> featureEvolutions = Arrays.asList(
+                createFeatureEvolution(firstDate, toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10),
+                        toCoordinate(0, 10)),
+                createFeatureEvolution(secondDate, toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10)));
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(featureEvolutions);
+        assertEquals(2, geoJsonFeatureEvolutions.size());
+        assertEvolutionEquals(firstDate, EARSED, "POLYGON ((0 0, 0 10, 10 10, 0 0))", geoJsonFeatureEvolutions.get(0));
+        assertEvolutionEquals(secondDate, CREATED, "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0))",
+                geoJsonFeatureEvolutions.get(1));
+    }
+
+    @Test
+    public void oneFeatureIsCreatedFromTwoGeometryCollectionWithOnePolygon() {
+        Date date = toDate(11, 00);
+        Polygon polygon = createPolygon(toCoordinate(0, 0), toCoordinate(10, 0), toCoordinate(10, 10));
+        List<FeatureEvolution> featureEvolutions = Arrays.asList(createFeatureEvolution(date, polygon),
+                createFeatureEvolution(toDate(12, 00), polygon));
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(featureEvolutions);
+        assertEquals(1, geoJsonFeatureEvolutions.size());
+        assertEvolutionEquals(date, CREATED, "POLYGON ((0 0, 10 0, 10 10, 0 0))", geoJsonFeatureEvolutions.get(0));
+    }
+
+    private void assertEvolutionEquals(Date date, GeoJsonStatus geoJsonStatus, Geometry geometry,
+            GeoJsonFeatureEvolution geoJsonFeatureEvolution) {
+        assertEvolutionEquals(date, geoJsonStatus, geometry.toString(), geoJsonFeatureEvolution);
+    }
+
+    private void assertEvolutionEquals(Date date, GeoJsonStatus geoJsonStatus, String geometry,
+            GeoJsonFeatureEvolution geoJsonFeatureEvolution) {
+        assertEquals(date, geoJsonFeatureEvolution.getDate());
+        assertEquals(geoJsonStatus, geoJsonFeatureEvolution.getStatus());
+        assertEquals(FEATURE_GROUP, geoJsonFeatureEvolution.getFeatureGroup());
+        assertEquals(geometry, geoJsonFeatureEvolution.getGeometry().toString());
     }
 
     private FeatureEvolution createFeatureEvolution(Date date, Coordinate... coordinates) {
