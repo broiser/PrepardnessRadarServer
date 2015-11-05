@@ -2,6 +2,7 @@ package at.jku.cis.radar.service;
 
 import static at.jku.cis.radar.geojson.GeoJsonStatus.CREATED;
 import static at.jku.cis.radar.geojson.GeoJsonStatus.EARSED;
+//github.com/broiser/PreparednessRadarServer.git
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;

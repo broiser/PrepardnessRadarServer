@@ -52,10 +52,10 @@ public class FeatureEvolutionPreparer implements Serializable {
             Geometry geometry = geometryCollection.getGeometryN(n);
 
             if (currentGeoJsonFeatureEvolutions.isEmpty()) {
+                long featureGroup = featureEvolution.getFeatureGroup();
                 Map<String, Object> properties = featureEvolution.getProperties();
-                GeoJsonFeatureEvolution geoJsonFeatureEvolution = buildGeoJsonFeatureEvolution(date,
-                        featureEvolution.getFeatureGroup(), geometry, properties, CREATED);
-                geoJsonFeatureEvolutions.add(geoJsonFeatureEvolution);
+                geoJsonFeatureEvolutions
+                        .add(buildGeoJsonFeatureEvolution(date, featureGroup, geometry, properties, CREATED));
             } else {
                 for (GeoJsonFeatureEvolution geoJsonFeatureEvolution : currentGeoJsonFeatureEvolutions) {
                     geoJsonFeatureEvolutions.addAll(intersectFeatureEvolution(geoJsonFeatureEvolution, geometry, date));
@@ -92,7 +92,6 @@ public class FeatureEvolutionPreparer implements Serializable {
                         featureGroup, createdGeomtry, properties, CREATED));
             }
         }
-
         return geoJsonFeatureEvolutions;
     }
 
