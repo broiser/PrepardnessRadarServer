@@ -11,7 +11,7 @@ import at.jku.cis.radar.geojson.GeoJsonStatus;
 
 public class GeoJsonFeatureEvolutionBuilder implements Serializable {
 
-    private GeoJsonFeatureEvolution geoJsonFeatureEvolution = new GeoJsonFeatureEvolution();
+	private GeoJsonFeatureEvolution geoJsonFeatureEvolution = new GeoJsonFeatureEvolution();
 
     public GeoJsonFeatureEvolutionBuilder withStatus(GeoJsonStatus status) {
         geoJsonFeatureEvolution.setStatus(status);

@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeInfo.Id;
 
 @JsonTypeInfo(property = GeoJsonObject.TYPE, use = Id.NAME)
-@JsonSubTypes({ @Type(FeatureCollection.class), @Type(Feature.class) })
+@JsonSubTypes({ @Type(GeoJsonFeatureCollection.class), @Type(GeoJsonFeature.class) })
 public interface GeoJsonObject extends Serializable {
 
     static final String TYPE = "type";

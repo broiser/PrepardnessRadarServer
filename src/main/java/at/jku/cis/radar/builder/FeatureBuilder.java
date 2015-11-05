@@ -5,11 +5,11 @@ import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import at.jku.cis.radar.geojson.Feature;
+import at.jku.cis.radar.geojson.GeoJsonFeature;
 
 public class FeatureBuilder implements Serializable {
 
-    private Feature feature = new Feature();
+    private GeoJsonFeature feature = new GeoJsonFeature();
 
     public FeatureBuilder withGeometry(Geometry geometry) {
         feature.setGeometry(geometry);
@@ -26,7 +26,7 @@ public class FeatureBuilder implements Serializable {
         return this;
     }
 
-    public Feature build() {
+    public GeoJsonFeature build() {
         return feature;
     }
 

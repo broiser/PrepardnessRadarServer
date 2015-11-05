@@ -1,3 +1,4 @@
+
 package at.jku.cis.radar.builder;
 
 import java.io.Serializable;
@@ -5,11 +6,11 @@ import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import at.jku.cis.radar.geojson.Feature;
+import at.jku.cis.radar.geojson.GeoJsonFeature;
 
 public class GeoJsonFeatureBuilder implements Serializable {
 
-    private Feature geoJsonFeature = new Feature();
+    private GeoJsonFeature geoJsonFeature = new GeoJsonFeature();
 
     public GeoJsonFeatureBuilder withGeometry(Geometry geometry) {
         geoJsonFeature.setGeometry(geometry);
@@ -26,7 +27,7 @@ public class GeoJsonFeatureBuilder implements Serializable {
         return this;
     }
 
-    public Feature build() {
+    public GeoJsonFeature build() {
         return geoJsonFeature;
     }
 

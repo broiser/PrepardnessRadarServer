@@ -1,8 +1,9 @@
+
 package at.jku.cis.radar.geojson;
 
 import java.util.Date;
 
-public class GeoJsonFeatureEvolution extends Feature {
+public class GeoJsonFeatureEvolution extends GeoJsonFeature {
     private Date date;
     private GeoJsonStatus status;
 
