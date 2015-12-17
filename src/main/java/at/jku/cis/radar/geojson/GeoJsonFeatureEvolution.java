@@ -3,24 +3,34 @@ package at.jku.cis.radar.geojson;
 
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 public class GeoJsonFeatureEvolution extends GeoJsonFeature {
-    private Date date;
-    private GeoJsonStatus status;
+	private static final String STATUS = "status";
+	private static final String DATE = "date";
 
-    public Date getDate() {
-        return date;
-    }
+	@JsonIgnore
+	public Date getDate() {
+		return (Date) getProperties().get(DATE);
+	}
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+	public void setDate(Date date) {
+		getProperties().put(DATE, date);
+	}
 
-    public GeoJsonStatus getStatus() {
-        return status;
-    }
+	@JsonProperty
+	public String getDateAsString() {
+		return getDate().toString();
+	}
 
-    public void setStatus(GeoJsonStatus status) {
-        this.status = status;
-    }
+	public void setStatus(GeoJsonStatus status) {
+		getProperties().put(STATUS, status.name());
+	}
+
+	@JsonIgnore
+	public GeoJsonStatus getStatus() {
+		return GeoJsonStatus.valueOf((String) getProperties().get(STATUS));
+	}
 
 }

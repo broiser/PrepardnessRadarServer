@@ -13,33 +13,33 @@ public class GeoJsonFeatureEvolutionBuilder implements Serializable {
 
 	private GeoJsonFeatureEvolution geoJsonFeatureEvolution = new GeoJsonFeatureEvolution();
 
-    public GeoJsonFeatureEvolutionBuilder withStatus(GeoJsonStatus status) {
-        geoJsonFeatureEvolution.setStatus(status);
-        return this;
-    }
+	public GeoJsonFeatureEvolutionBuilder withProperties(Map<String, Object> properties) {
+		geoJsonFeatureEvolution.getProperties().putAll(properties);
+		return this;
+	}
 
-    public GeoJsonFeatureEvolutionBuilder withDate(Date date) {
-        geoJsonFeatureEvolution.setDate(date);
-        return this;
-    }
+	public GeoJsonFeatureEvolutionBuilder withStatus(GeoJsonStatus status) {
+		geoJsonFeatureEvolution.setStatus(status);
+		return this;
+	}
 
-    public GeoJsonFeatureEvolutionBuilder withGeometry(Geometry geometry) {
-        geoJsonFeatureEvolution.setGeometry(geometry);
-        return this;
-    }
+	public GeoJsonFeatureEvolutionBuilder withDate(Date date) {
+		geoJsonFeatureEvolution.setDate(date);
+		return this;
+	}
 
-    public GeoJsonFeatureEvolutionBuilder withFeatureGroup(long featureGroup) {
-        geoJsonFeatureEvolution.setFeatureGroup(featureGroup);
-        return this;
-    }
+	public GeoJsonFeatureEvolutionBuilder withGeometry(Geometry geometry) {
+		geoJsonFeatureEvolution.setGeometry(geometry);
+		return this;
+	}
 
-    public GeoJsonFeatureEvolutionBuilder withProperties(Map<String, Object> properties) {
-        geoJsonFeatureEvolution.setProperties(properties);
-        return this;
-    }
+	public GeoJsonFeatureEvolutionBuilder withFeatureGroup(long featureGroup) {
+		geoJsonFeatureEvolution.setFeatureGroup(featureGroup);
+		return this;
+	}
 
-    public GeoJsonFeatureEvolution build() {
-        return geoJsonFeatureEvolution;
-    }
+	public GeoJsonFeatureEvolution build() {
+		return geoJsonFeatureEvolution;
+	}
 
 }
