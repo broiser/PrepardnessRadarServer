@@ -66,6 +66,7 @@ public class FeatureRestService extends RestService {
     }
 
     private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEvolution> featureEvolutions) {
-        return new GeoJsonFeatureCollection(CollectionUtils.collect(featureEvolutions, featureEvolution2GeoJsonFeatureTransformer));
+        return new GeoJsonFeatureCollection(
+                CollectionUtils.collect(featureEvolutions, featureEvolution2GeoJsonFeatureTransformer));
     }
 }

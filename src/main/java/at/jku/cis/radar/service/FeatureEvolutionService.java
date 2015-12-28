@@ -91,8 +91,8 @@ public class FeatureEvolutionService implements Serializable {
         featureEvolution.setProperties(geoJsonFeature.getProperties());
         if (geoJsonFeature.getFeatureGroup() <= 0) {
             featureEvolution.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
-        } else{
-        	featureEvolution.setFeatureGroup(geoJsonFeature.getFeatureGroup());
+        } else {
+            featureEvolution.setFeatureGroup(geoJsonFeature.getFeatureGroup());
         }
         return featureEvolution;
     }
