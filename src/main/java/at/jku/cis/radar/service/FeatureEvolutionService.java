@@ -12,7 +12,6 @@ import javax.transaction.Transactional;
 
 import org.joda.time.DateTime;
 
-import at.jku.cis.radar.dao.EventDao;
 import at.jku.cis.radar.dao.FeatureEvolutionDao;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.model.Event;
@@ -22,14 +21,14 @@ import at.jku.cis.radar.model.FeatureEvolution;
 public class FeatureEvolutionService implements Serializable {
 
     @Inject
-    private EventDao eventDao;
+    private EventService eventService;
     @Inject
     private FeatureGroupService featureGroupService;
     @Inject
     private FeatureEvolutionDao featureEvolutionDao;
 
     public List<FeatureEvolution> findNewestByEvent(long eventId, DateTime from, DateTime to) {
-        Event event = eventDao.findById(eventId);
+        Event event = eventService.findById(eventId);
         if (event == null) {
             return Collections.emptyList();
         }
@@ -58,14 +57,14 @@ public class FeatureEvolutionService implements Serializable {
 
     @Transactional
     public FeatureEvolution create(long eventId, GeoJsonFeature geoJsonFeature) {
-        Event event = eventDao.findById(eventId);
+        Event event = eventService.findById(eventId);
         Date date = DateTime.now().toDate();
         return createFeatureEvolution(geoJsonFeature, event, date);
     }
 
     @Transactional
     public List<FeatureEvolution> save(long eventId, List<GeoJsonFeature> geoJsonFeatures) {
-        Event event = eventDao.findById(eventId);
+        Event event = eventService.findById(eventId);
         Date date = DateTime.now().toDate();
         List<FeatureEvolution> featureEvolutions = new ArrayList<>();
         for (GeoJsonFeature geoJsonFeature : geoJsonFeatures) {
