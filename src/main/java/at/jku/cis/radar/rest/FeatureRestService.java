@@ -1,5 +1,7 @@
 package at.jku.cis.radar.rest;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,7 +68,8 @@ public class FeatureRestService extends RestService {
     }
 
     private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEvolution> featureEvolutions) {
-        return new GeoJsonFeatureCollection(
-                CollectionUtils.collect(featureEvolutions, featureEvolution2GeoJsonFeatureTransformer));
+        Collection<GeoJsonFeature> geoJsonFeatures = CollectionUtils.collect(featureEvolutions,
+                featureEvolution2GeoJsonFeatureTransformer);
+        return new GeoJsonFeatureCollection(new ArrayList<>(geoJsonFeatures));
     }
 }

@@ -10,11 +10,13 @@ import javax.ws.rs.core.Response;
 
 import org.joda.time.DateTime;
 
+import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
+import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
 import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.service.FeatureEvolutionPreparer;
 import at.jku.cis.radar.service.FeatureEvolutionService;
 
-@Path("featureEvolutions")
+@Path("featuresEvolution")
 public class FeatureEvolutionRestService extends RestService {
 
     @Inject
@@ -26,7 +28,7 @@ public class FeatureEvolutionRestService extends RestService {
     @Path("{eventId}/{featureGroup}")
     public Response getFeatureEvolution(@PathParam("eventId") long eventId,
             @PathParam("featureGroup") long featureGroup) {
-        DateTime dateTime = DateTime.now().withTimeAtStartOfDay();
+        DateTime dateTime = new DateTime(2015, 12, 17, 0, 0);
         long from = dateTime.getMillis();
         long to = dateTime.plusDays(1).getMillis();
         return getFeatureEvolution(eventId, featureGroup, from, to);
@@ -37,7 +39,9 @@ public class FeatureEvolutionRestService extends RestService {
     public Response getFeatureEvolution(@PathParam("eventId") long eventId,
             @PathParam("featureGroup") long featureGroup, @PathParam("from") long from, @PathParam("to") long to) {
         List<FeatureEvolution> featureEvolutions = findBetween(eventId, featureGroup, from, to);
-        return Response.ok(featureEvolutionPreparer.prepareEvolution(featureEvolutions)).build();
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(featureEvolutions);
+        return Response.ok(new GeoJsonFeatureCollection(geoJsonFeatureEvolutions)).build();
     }
 
     private List<FeatureEvolution> findBetween(long eventId, long featureGroup, long from, long to) {
