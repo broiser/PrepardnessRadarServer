@@ -15,7 +15,9 @@ import javax.enterprise.context.ApplicationScoped;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 
+import at.jku.cis.radar.builder.GeoJsonFeatureBuilder;
 import at.jku.cis.radar.builder.GeoJsonFeatureEvolutionBuilder;
+import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
 import at.jku.cis.radar.geojson.GeoJsonStatus;
 import at.jku.cis.radar.model.FeatureEvolution;
@@ -58,7 +60,19 @@ public class FeatureEvolutionPreparer implements Serializable {
                         .add(buildGeoJsonFeatureEvolution(date, featureGroup, geometry, properties, CREATED));
             } else {
                 for (GeoJsonFeatureEvolution geoJsonFeatureEvolution : currentGeoJsonFeatureEvolutions) {
-                    geoJsonFeatureEvolutions.addAll(intersectFeatureEvolution(geoJsonFeatureEvolution, geometry, date));
+                	List<GeoJsonFeatureEvolution> list = intersectFeatureEvolution(geoJsonFeatureEvolution, geometry, date);
+                	boolean found  = false;
+                	//TODO HashSet verwenden!!!!
+                	for(GeoJsonFeatureEvolution intersectionFeature : list){
+                		for(GeoJsonFeatureEvolution listFeature : geoJsonFeatureEvolutions){
+                			if(intersectionFeature.getGeometry().equals(listFeature.getGeometry())){
+                				found = true;
+                			}
+                		}
+                		if(!found){
+                    		geoJsonFeatureEvolutions.add(intersectionFeature);
+                    	}
+                	}
                 }
             }
         }
@@ -72,31 +86,50 @@ public class FeatureEvolutionPreparer implements Serializable {
         Map<String, Object> properties = geoJsonFeatureEvolution.getProperties();
         GeoJsonStatus status = geoJsonFeatureEvolution.getStatus();
         long featureGroup = geoJsonFeatureEvolution.getFeatureGroup();
-
-        if (geoJsonFeatureEvolution.getGeometry().disjoint(geometry)) {
+        if (geoJsonFeatureEvolution.getGeometry().touches(geometry) || geoJsonFeatureEvolution.getGeometry().disjoint(geometry)) {
             geoJsonFeatureEvolutions.add(geoJsonFeatureEvolution);
         } else {
             Geometry createdGeometry = geoJsonFeatureEvolution.getGeometry().difference(geometry);
-            Geometry erasedGeometry = geometry.difference(geoJsonFeatureEvolution.getGeometry());
-
+            Geometry erasedGeometry = geometry.difference(geoJsonFeatureEvolution.getGeometry()); 
             if (createdGeometry.isEmpty() && erasedGeometry.isEmpty()) {
                 geoJsonFeatureEvolutions
                         .add(buildGeoJsonFeatureEvolution(date, featureGroup, geometry, properties, status));
             } else if (createdGeometry.isEmpty()) {
-                geoJsonFeatureEvolutions.add(buildGeoJsonFeatureEvolution(geoJsonFeatureEvolution.getDate(),
-                        featureGroup, erasedGeometry, properties, ERASED));
-                geoJsonFeatureEvolutions.add(buildGeoJsonFeatureEvolution(date, featureGroup,
-                        geometry.difference(erasedGeometry), properties, CREATED));
-                // create
+                eraseGeometry(geoJsonFeatureEvolution, geometry, date, geoJsonFeatureEvolutions, properties,
+						featureGroup, erasedGeometry);
             } else if (erasedGeometry.isEmpty()) {
-                geoJsonFeatureEvolutions
-                        .add(buildGeoJsonFeatureEvolution(date, featureGroup, geometry, properties, CREATED));
-                geoJsonFeatureEvolutions.add(buildGeoJsonFeatureEvolution(geoJsonFeatureEvolution.getDate(),
-                        featureGroup, createdGeometry, properties, CREATED));
+                createGeometry(geoJsonFeatureEvolution, geometry, date, geoJsonFeatureEvolutions, properties,
+						featureGroup, createdGeometry);
+            } else{
+            	if(erasedGeometry.getArea() > createdGeometry.getArea()){
+            		eraseGeometry(geoJsonFeatureEvolution, geometry, date, geoJsonFeatureEvolutions, properties,
+    						featureGroup, erasedGeometry);
+            	}else{
+            		createGeometry(geoJsonFeatureEvolution, geometry, date, geoJsonFeatureEvolutions, properties,
+    						featureGroup, createdGeometry);
+            	}
             }
         }
         return geoJsonFeatureEvolutions;
     }
+
+	private void createGeometry(GeoJsonFeatureEvolution geoJsonFeatureEvolution, Geometry geometry, Date date,
+			List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions, Map<String, Object> properties, long featureGroup,
+			Geometry createdGeometry) {
+		geoJsonFeatureEvolutions
+		        .add(buildGeoJsonFeatureEvolution(date, featureGroup, geometry, properties, CREATED));
+		geoJsonFeatureEvolutions.add(buildGeoJsonFeatureEvolution(geoJsonFeatureEvolution.getDate(),
+		        featureGroup, createdGeometry, properties, CREATED));
+	}
+
+	private void eraseGeometry(GeoJsonFeatureEvolution geoJsonFeatureEvolution, Geometry geometry, Date date,
+			List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions, Map<String, Object> properties, long featureGroup,
+			Geometry erasedGeometry) {
+		geoJsonFeatureEvolutions.add(buildGeoJsonFeatureEvolution(geoJsonFeatureEvolution.getDate(),
+		        featureGroup, erasedGeometry, properties, ERASED));
+		geoJsonFeatureEvolutions.add(buildGeoJsonFeatureEvolution(date, featureGroup,
+		        geometry.difference(erasedGeometry), properties, CREATED));
+	}
 
     private GeoJsonFeatureEvolution buildGeoJsonFeatureEvolution(Date date, long featureGroup, Geometry geometry,
             Map<String, Object> properties, GeoJsonStatus geoJsonStatus) {

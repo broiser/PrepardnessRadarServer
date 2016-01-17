@@ -28,6 +28,5 @@ public class FeatureEvolutionDao extends AbstractDao<FeatureEvolution> {
         return createNamedQuery(FeatureEvolution.FIND_BETWEEN_BY_EVENT_AND_FEATURE_GROUP)
                 .setParameter("eventId", eventId).setParameter("featureGroup", featureGroup)
                 .setParameter("fromDate", fromDate).setParameter("toDate", toDate).getResultList();
-
     }
 }
