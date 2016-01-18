@@ -33,7 +33,8 @@ public class FeatureEvolutionPreparer implements Serializable {
     }
 
     private List<GeoJsonFeatureEvolution> createFeatureEvolutions(List<FeatureEvolution> featureEvolutions) {
-        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = new ArrayList<>();
+
+    	List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = new ArrayList<>();
 
         for (int i = featureEvolutions.size() - 1; i >= 0; i--) {
             FeatureEvolution featureEvolution = featureEvolutions.get(i);
@@ -86,7 +87,7 @@ public class FeatureEvolutionPreparer implements Serializable {
         Map<String, Object> properties = geoJsonFeatureEvolution.getProperties();
         GeoJsonStatus status = geoJsonFeatureEvolution.getStatus();
         long featureGroup = geoJsonFeatureEvolution.getFeatureGroup();
-        if (geoJsonFeatureEvolution.getGeometry().touches(geometry) || geoJsonFeatureEvolution.getGeometry().disjoint(geometry)) {
+        if (geoJsonFeatureEvolution.getGeometry().disjoint(geometry)) {
             geoJsonFeatureEvolutions.add(geoJsonFeatureEvolution);
         } else {
             Geometry createdGeometry = geoJsonFeatureEvolution.getGeometry().difference(geometry);
