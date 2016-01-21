@@ -40,8 +40,17 @@ public class FeatureEvolutionService implements Serializable {
         return featureEvolutionDao.findNewestByEvent(event.getId(), fromDate.toDate(), to.toDate());
     }
 
-    public List<FeatureEvolution> findBetween(long eventId, long featureGroup, DateTime fromDate, DateTime toDate) {
-        return featureEvolutionDao.findBetween(eventId, featureGroup, fromDate.toDate(), toDate.toDate());
+    public List<FeatureEvolution> findBetween(long eventId, long featureGroup, DateTime from, DateTime to) {
+        Event event = eventService.findById(eventId);
+        if (event == null) {
+            return Collections.emptyList();
+        }
+        return findBetween(event, featureGroup, from, to);
+    }
+
+    private List<FeatureEvolution> findBetween(Event event, long featureGroup, DateTime from, DateTime to) {
+        DateTime fromDate = from.minus(event.getValidationPeriod());
+        return featureEvolutionDao.findBetween(event.getId(), featureGroup, fromDate.toDate(), to.toDate());
     }
 
     @Transactional
