@@ -44,4 +44,17 @@ public class GeoJsonFeature implements GeoJsonObject {
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
+
+    @Override
+    public int hashCode() {
+        return geometry.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof GeoJsonFeature)) {
+            return false;
+        }
+        return ((GeoJsonFeature) obj).geometry.equals(geometry);
+    }
 }
