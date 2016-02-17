@@ -61,9 +61,12 @@ public class FeatureEvolutionService implements Serializable {
         if (featureEvolution == null) {
             throw new IllegalArgumentException("FeatureGroup not found");
         }
-        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
-        featureEvolution.setProperties(geoJsonFeature.getProperties());
-        return featureEvolutionDao.save(featureEvolution);
+        
+//        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
+//        featureEvolution.setProperties(geoJsonFeature.getProperties());
+        Event event = eventService.findById(eventId);
+        geoJsonFeature.setFeatureGroup(featureEvolution.getFeatureGroup());
+        return createFeatureEvolution(geoJsonFeature, event, featureEvolution.getDate());
     }
 
     @Transactional
