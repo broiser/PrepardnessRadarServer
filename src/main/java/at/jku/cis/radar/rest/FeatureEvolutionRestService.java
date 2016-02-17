@@ -36,9 +36,9 @@ public class FeatureEvolutionRestService extends RestService {
     @Path("{eventId}/{featureGroup}")
     public Response getFeatureEvolution(@PathParam("eventId") long eventId,
             @PathParam("featureGroup") long featureGroup) {
-        DateTime dateTime = DateTime.now().withTimeAtStartOfDay();
-        long from = dateTime.getMillis();
-        long to = dateTime.plusDays(1).getMillis();
+        DateTime dateTime = DateTime.now();
+        long to = dateTime.getMillis();
+        long from = dateTime.minusDays(1).getMillis();
         return getFeatureEvolution(eventId, featureGroup, from, to);
     }
     

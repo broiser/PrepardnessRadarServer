@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 
 import at.jku.cis.radar.dao.FeatureEvolutionDao;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
@@ -36,6 +37,7 @@ public class FeatureEvolutionService implements Serializable {
     }
 
     private List<FeatureEvolution> findNewestByEvent(Event event, DateTime from, DateTime to) {
+    	
         DateTime fromDate = from.minus(event.getValidationPeriod());
         return featureEvolutionDao.findNewestByEvent(event.getId(), fromDate.toDate(), to.toDate());
     }
