@@ -37,6 +37,8 @@ public class FeatureEvolution extends BaseEntity {
     @Type(type = "org.hibernate.spatial.GeometryType")
     @Column(name = "geometry", columnDefinition = "Geometry")
     private Geometry geometry;
+    private char status;
+    private long editorder;
     @Transient
     private Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -79,4 +81,20 @@ public class FeatureEvolution extends BaseEntity {
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
+
+	public char getStatus() {
+		return status;
+	}
+
+	public void setStatus(char status) {
+		this.status = status;
+	}
+
+	public long getEditorder() {
+		return editorder;
+	}
+
+	public void setEditorder(long editorder) {
+		this.editorder = editorder;
+	}
 }

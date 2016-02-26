@@ -28,6 +28,9 @@ public class FeatureEvolutionService implements Serializable {
     @Inject
     private FeatureEvolutionDao featureEvolutionDao;
 
+    private final long EDIT_ORDER_INITIAL_VALUE = 1;
+    
+    
     public List<FeatureEvolution> findNewestByEvent(long eventId, DateTime from, DateTime to) {
         Event event = eventService.findById(eventId);
         if (event == null) {
@@ -62,18 +65,20 @@ public class FeatureEvolutionService implements Serializable {
             throw new IllegalArgumentException("FeatureGroup not found");
         }
         
-//        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
-//        featureEvolution.setProperties(geoJsonFeature.getProperties());
         Event event = eventService.findById(eventId);
         geoJsonFeature.setFeatureGroup(featureEvolution.getFeatureGroup());
-        return createFeatureEvolution(geoJsonFeature, event, featureEvolution.getDate());
+        return createFeatureEvolution(geoJsonFeature, event, featureEvolution.getDate(), getNextEditOrder(featureEvolution));
     }
+
+	private long getNextEditOrder(FeatureEvolution featureEvolution) {
+		return featureEvolution.getEditorder() + 1;
+	}
 
     @Transactional
     public FeatureEvolution create(long eventId, GeoJsonFeature geoJsonFeature) {
         Event event = eventService.findById(eventId);
         Date date = DateTime.now().toDate();
-        return createFeatureEvolution(geoJsonFeature, event, date);
+        return createFeatureEvolution(geoJsonFeature, event, date, EDIT_ORDER_INITIAL_VALUE);
     }
 
     @Transactional
@@ -82,7 +87,7 @@ public class FeatureEvolutionService implements Serializable {
         Date date = DateTime.now().toDate();
         List<FeatureEvolution> featureEvolutions = new ArrayList<>();
         for (GeoJsonFeature geoJsonFeature : geoJsonFeatures) {
-            featureEvolutions.add(createFeatureEvolution(geoJsonFeature, event, date));
+            featureEvolutions.add(createFeatureEvolution(geoJsonFeature, event, date, 1));
         }
         return featureEvolutions;
     }
@@ -91,17 +96,19 @@ public class FeatureEvolutionService implements Serializable {
         return featureEvolutionDao.findNewestByFeatureGroup(eventId, featureGroup);
     }
 
-    private FeatureEvolution createFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date) {
-        FeatureEvolution featureEvolution = buildFeatureEvolution(geoJsonFeature, event, date);
+    private FeatureEvolution createFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date, long editorder) {
+        FeatureEvolution featureEvolution = buildFeatureEvolution(geoJsonFeature, event, date, editorder);
         return featureEvolutionDao.create(featureEvolution);
     }
 
-    private FeatureEvolution buildFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date) {
+    private FeatureEvolution buildFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date, long editorder) {
         FeatureEvolution featureEvolution = new FeatureEvolution();
         featureEvolution.setDate(date);
         featureEvolution.setEvent(event);
         featureEvolution.setGeometry(geoJsonFeature.getGeometry());
         featureEvolution.setProperties(geoJsonFeature.getProperties());
+        featureEvolution.setStatus(geoJsonFeature.getProperties().get("STATUS").equals("ERASED") ? 'e' : 'c');
+        featureEvolution.setEditorder(editorder);
         if (geoJsonFeature.getFeatureGroup() <= 0) {
             featureEvolution.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
         } else {
