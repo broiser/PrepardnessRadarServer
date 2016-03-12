@@ -6,22 +6,22 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
-import at.jku.cis.radar.model.FeatureEvolution;
+import at.jku.cis.radar.modelv2.FeatureEntry;
 
 @ApplicationScoped
-public class FeatureGroupDao extends AbstractDao<FeatureEvolution> {
+public class FeatureGroupDao extends AbstractDao<FeatureEntry> {
 
-    public FeatureGroupDao() {
-        super(FeatureEvolution.class);
-    }
+	public FeatureGroupDao() {
+		super(FeatureEntry.class);
+	}
 
-    public Long findNextFeatureGroup() {
-        CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
-        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
-        Root<FeatureEvolution> featureEvolutionRoot = criteriaQuery.from(FeatureEvolution.class);
-        Expression<Long> featureGroupExpression = featureEvolutionRoot.get("featureGroup").as(Long.class);
-        criteriaQuery.select(featureGroupExpression).orderBy(criteriaBuilder.desc(featureGroupExpression));
-        return getSingleResult(getEntityManager().createQuery(criteriaQuery).setMaxResults(1));
-    }
+	public Long findNextFeatureGroup() {
+		CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+		Root<FeatureEntry> featureEvolutionRoot = criteriaQuery.from(FeatureEntry.class);
+		Expression<Long> featureGroupExpression = featureEvolutionRoot.get("featureGroup").as(Long.class);
+		criteriaQuery.select(featureGroupExpression).orderBy(criteriaBuilder.desc(featureGroupExpression));
+		return getSingleResult(getEntityManager().createQuery(criteriaQuery).setMaxResults(1));
+	}
 
 }

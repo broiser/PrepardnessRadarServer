@@ -1,7 +1,10 @@
 package at.jku.cis.radar.geometry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import javax.swing.event.ListSelectionEvent;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -16,6 +19,33 @@ import com.vividsolutions.jts.geom.TopologyException;
 public class GeometryUtils {
 	private final static int MAX_UNION_TRIES = 100;
 
+	public static GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersection) {
+		List<Geometry> geometryList = new ArrayList<>();
+		for(int i = 0; i < geometries.getNumGeometries(); i++){
+			Geometry geometry = geometries.getGeometryN(i);
+			try {
+				if (geometry.intersects(geometryToIntersection)) {
+					Geometry intersectionGeometry = geometry.difference(geometryToIntersection);
+					if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
+						geometryList
+								.add(createMultiPolygon(PolygonRepairerService.repair((Polygon) intersectionGeometry)));
+					} else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
+						geometryList.add(
+								createMultiPolygon(PolygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
+					}
+				} else {
+					geometryList.add(geometry);
+				}
+			} catch (TopologyException e) {
+			}
+		}
+		return new GeometryCollection(geometryList.toArray(new Geometry[geometryList.size()]), new GeometryFactory());
+	}
+	
+	private static MultiPolygon createMultiPolygon(List<Polygon> polygons) {
+		return new GeometryFactory().createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+	}
+	
 	public static boolean intersects(GeometryCollection geometryCollection, Geometry intersectionGeometry) {
 		for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
 			if (geometryCollection.getGeometryN(i).intersects(intersectionGeometry)) {

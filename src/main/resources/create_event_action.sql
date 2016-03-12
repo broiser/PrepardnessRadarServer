@@ -36,7 +36,6 @@ create table FeatureEvoluation (
     event_id int8,
     feature_id int8,
     status char,
-    editorder int8,
     primary key (id)
 );
 

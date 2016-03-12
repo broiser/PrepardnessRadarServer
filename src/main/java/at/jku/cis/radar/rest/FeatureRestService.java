@@ -2,7 +2,6 @@ package at.jku.cis.radar.rest;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +52,8 @@ public class FeatureRestService extends RestService {
 			@PathParam("to") long to) {
 		DateTime toDate = new DateTime(to);
 		DateTime fromDate = new DateTime(from);
-		List<FeatureEvolution> featureEvolutions = featureEvolutionService.findNewestByEvent(eventId, fromDate, toDate);
-
-		Map<Long, FeatureEvolution> combinedFeatureEvolutions = partitionAndCombine(featureEvolutions);
-		return Response.ok(buildGeoJsonFeatureCollection(combinedFeatureEvolutions.values())).build();
+		List<FeatureEvolution> featureEvolutions = featureEvolutionService.findFeaturesByEvent(eventId, fromDate, toDate);
+		return Response.ok(buildGeoJsonFeatureCollection(partitionAndCombine(featureEvolutions))).build();
 	}
 
 	@PUT
@@ -74,9 +71,10 @@ public class FeatureRestService extends RestService {
 		FeatureEvolution featureEvolution = featureEvolutionService.create(eventId, geoJsonFeature);
 		return Response.ok(featureEvolution2GroupTransformer.transform(featureEvolution)).build();
 	}
-
-	private Map<Long, FeatureEvolution> partitionAndCombine(List<FeatureEvolution> featureEvolutions) {
+	
+	private List<FeatureEvolution> partitionAndCombine(List<FeatureEvolution> featureEvolutions) {
 		Map<Long, FeatureEvolution> partitionedFeatureEvolutions = new HashMap<>();
+
 		for (FeatureEvolution featureEvolution : featureEvolutions) {
 			if (!(partitionedFeatureEvolutions.containsKey(featureEvolution.getFeatureGroup()))) {
 				partitionedFeatureEvolutions.put(featureEvolution.getFeatureGroup(), featureEvolution);
@@ -84,15 +82,21 @@ public class FeatureRestService extends RestService {
 				FeatureEvolution currentFeatureEvolution = partitionedFeatureEvolutions
 						.get(featureEvolution.getFeatureGroup());
 				GeometryCollection c = (GeometryCollection) currentFeatureEvolution.getGeometry();
-				currentFeatureEvolution
-						.setGeometry(GeometryUtils.union((GeometryCollection) currentFeatureEvolution.getGeometry(),
-								(GeometryCollection) featureEvolution.getGeometry()));
+				if (featureEvolution.getStatus() == 'c') {
+					currentFeatureEvolution
+							.setGeometry(GeometryUtils.union((GeometryCollection) currentFeatureEvolution.getGeometry(),
+									(GeometryCollection) featureEvolution.getGeometry()));
+				} else {
+					currentFeatureEvolution.setGeometry(
+							GeometryUtils.difference((GeometryCollection) currentFeatureEvolution.getGeometry(),
+									featureEvolution.getGeometry().getGeometryN(0)));
+				}
 			}
 		}
-		return partitionedFeatureEvolutions;
+		return new ArrayList<FeatureEvolution>(partitionedFeatureEvolutions.values());
 	}
 
-	private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(Collection<FeatureEvolution> featureEvolutions) {
+	private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEvolution> featureEvolutions) {
 		Collection<GeoJsonFeature> geoJsonFeatures = CollectionUtils.collect(featureEvolutions,
 				featureEvolution2GeoJsonFeatureTransformer);
 		return new GeoJsonFeatureCollection(new ArrayList<>(geoJsonFeatures));
