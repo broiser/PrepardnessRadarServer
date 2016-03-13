@@ -15,97 +15,96 @@ import org.joda.time.DateTime;
 import at.jku.cis.radar.dao.FeatureEvolutionDao;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.model.FeatureEvolution;
-import at.jku.cis.radar.modelv2.Event;
+import at.jku.cis.radar.model.v2.Event;
 
 @ApplicationScoped
 public class FeatureEvolutionService implements Serializable {
 
-	@Inject
-	private EventService eventService;
-	@Inject
-	private FeatureGroupService featureGroupService;
-	@Inject
-	private FeatureEvolutionDao featureEvolutionDao;
+    @Inject
+    private EventService eventService;
+    @Inject
+    private FeatureGroupService featureGroupService;
+    @Inject
+    private FeatureEvolutionDao featureEvolutionDao;
 
-	public List<FeatureEvolution> findFeaturesByEvent(long eventId, DateTime from, DateTime to) {
-		Event event = eventService.findById(eventId);
-		if (event == null) {
-			return Collections.emptyList();
-		}
-		return findFeaturesByEvent(event, from, to);
-	}
+    public List<FeatureEvolution> findFeaturesByEvent(long eventId, DateTime from, DateTime to) {
+        Event event = eventService.findById(eventId);
+        if (event == null) {
+            return Collections.emptyList();
+        }
+        return findFeaturesByEvent(event, from, to);
+    }
 
-	private List<FeatureEvolution> findFeaturesByEvent(Event event, DateTime from, DateTime to) {
-		DateTime fromDate = from.minus(event.getValidationPeriod());
-		return featureEvolutionDao.findNewestByEvent(event.getId(), fromDate.toDate(), to.toDate());
-	}
+    private List<FeatureEvolution> findFeaturesByEvent(Event event, DateTime from, DateTime to) {
+        DateTime fromDate = from.minus(event.getValidationPeriod());
+        return featureEvolutionDao.findNewestByEvent(event.getId(), fromDate.toDate(), to.toDate());
+    }
 
-	public List<FeatureEvolution> findBetween(long eventId, long featureGroup, DateTime from, DateTime to) {
-		Event event = eventService.findById(eventId);
-		if (event == null) {
-			return Collections.emptyList();
-		}
-		return findBetween(event, featureGroup, from, to);
-	}
+    public List<FeatureEvolution> findBetween(long eventId, long featureGroup, DateTime from, DateTime to) {
+        Event event = eventService.findById(eventId);
+        if (event == null) {
+            return Collections.emptyList();
+        }
+        return findBetween(event, featureGroup, from, to);
+    }
 
-	private List<FeatureEvolution> findBetween(Event event, long featureGroup, DateTime from, DateTime to) {
-		DateTime fromDate = from.minus(event.getValidationPeriod());
-		return featureEvolutionDao.findBetween(event.getId(), featureGroup, fromDate.toDate(), to.toDate());
-	}
+    private List<FeatureEvolution> findBetween(Event event, long featureGroup, DateTime from, DateTime to) {
+        DateTime fromDate = from.minus(event.getValidationPeriod());
+        return featureEvolutionDao.findBetween(event.getId(), featureGroup, fromDate.toDate(), to.toDate());
+    }
 
-	@Transactional
-	public FeatureEvolution save(long eventId, GeoJsonFeature geoJsonFeature) {
-		FeatureEvolution featureEvolution = findNewestByFeatureGroup(eventId, geoJsonFeature.getFeatureGroup());
-		if (featureEvolution == null) {
-			throw new IllegalArgumentException("FeatureGroup not found");
-		}
+    @Transactional
+    public FeatureEvolution save(long eventId, GeoJsonFeature geoJsonFeature) {
+        FeatureEvolution featureEvolution = findNewestByFeatureGroup(eventId, geoJsonFeature.getFeatureGroup());
+        if (featureEvolution == null) {
+            throw new IllegalArgumentException("FeatureGroup not found");
+        }
 
-		featureEvolution.setGeometry(geoJsonFeature.getGeometry());
-		featureEvolution.setProperties(geoJsonFeature.getProperties());
-		return featureEvolutionDao.save(featureEvolution);
-	}
+        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
+        featureEvolution.setProperties(geoJsonFeature.getProperties());
+        return featureEvolutionDao.save(featureEvolution);
+    }
 
-	@Transactional
-	public FeatureEvolution create(long eventId, GeoJsonFeature geoJsonFeature) {
-		Event event = eventService.findById(eventId);
-		Date date = DateTime.now().toDate();
-		return createFeatureEvolution(geoJsonFeature, event, date);
-	}
+    @Transactional
+    public FeatureEvolution create(long eventId, GeoJsonFeature geoJsonFeature) {
+        Event event = eventService.findById(eventId);
+        Date date = DateTime.now().toDate();
+        return createFeatureEvolution(geoJsonFeature, event, date);
+    }
 
-	@Transactional
-	public List<FeatureEvolution> save(long eventId, List<GeoJsonFeature> geoJsonFeatures) {
-		Event event = eventService.findById(eventId);
-		Date date = DateTime.now().toDate();
-		List<FeatureEvolution> featureEvolutions = new ArrayList<>();
-		for (GeoJsonFeature geoJsonFeature : geoJsonFeatures) {
-			featureEvolutions.add(createFeatureEvolution(geoJsonFeature, event, date));
-		}
-		return featureEvolutions;
-	}
+    @Transactional
+    public List<FeatureEvolution> save(long eventId, List<GeoJsonFeature> geoJsonFeatures) {
+        Event event = eventService.findById(eventId);
+        Date date = DateTime.now().toDate();
+        List<FeatureEvolution> featureEvolutions = new ArrayList<>();
+        for (GeoJsonFeature geoJsonFeature : geoJsonFeatures) {
+            featureEvolutions.add(createFeatureEvolution(geoJsonFeature, event, date));
+        }
+        return featureEvolutions;
+    }
 
-	private FeatureEvolution findNewestByFeatureGroup(long eventId, long featureGroup) {
-		return featureEvolutionDao.findNewestByFeatureGroup(eventId,
-						 featureGroup);
-	}
+    private FeatureEvolution findNewestByFeatureGroup(long eventId, long featureGroup) {
+        return featureEvolutionDao.findNewestByFeatureGroup(eventId, featureGroup);
+    }
 
-	private FeatureEvolution createFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date) {
-		FeatureEvolution featureEvolution = buildFeatureEvolution(geoJsonFeature, event, date);
-		return featureEvolutionDao.create(featureEvolution);
-	}
+    private FeatureEvolution createFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date) {
+        FeatureEvolution featureEvolution = buildFeatureEvolution(geoJsonFeature, event, date);
+        return featureEvolutionDao.create(featureEvolution);
+    }
 
-	private FeatureEvolution buildFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date) {
-		FeatureEvolution featureEvolution = new FeatureEvolution();
-		featureEvolution.setDate(date);
-		featureEvolution.setEvent(event);
-		featureEvolution.setGeometry(geoJsonFeature.getGeometry());
-		featureEvolution.setProperties(geoJsonFeature.getProperties());
-		featureEvolution.setStatus(geoJsonFeature.getProperties().get("STATUS").equals("ERASED") ? 'e' : 'c');
-		if (geoJsonFeature.getFeatureGroup() <= 0) {
-			featureEvolution.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
-		} else {
-			featureEvolution.setFeatureGroup(geoJsonFeature.getFeatureGroup());
-		}
-		return featureEvolution;
-	}
+    private FeatureEvolution buildFeatureEvolution(GeoJsonFeature geoJsonFeature, Event event, Date date) {
+        FeatureEvolution featureEvolution = new FeatureEvolution();
+        featureEvolution.setDate(date);
+        featureEvolution.setEvent(event);
+        featureEvolution.setGeometry(geoJsonFeature.getGeometry());
+        featureEvolution.setProperties(geoJsonFeature.getProperties());
+        featureEvolution.setStatus(geoJsonFeature.getProperties().get("STATUS").equals("ERASED") ? 'e' : 'c');
+        if (geoJsonFeature.getFeatureGroup() <= 0) {
+            featureEvolution.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
+        } else {
+            featureEvolution.setFeatureGroup(geoJsonFeature.getFeatureGroup());
+        }
+        return featureEvolution;
+    }
 
 }

@@ -25,60 +25,61 @@ import at.jku.cis.radar.service.FeatureEvolutionService;
 @Path("featuresEvolution")
 public class FeatureEvolutionRestService extends RestService {
 
-	@Inject
-	private FeatureEvolutionService featureEvolutionService;
-	@Inject
-	private FeatureEvolutionPreparer featureEvolutionPreparer;
+    @Inject
+    private FeatureEvolutionService featureEvolutionService;
+    @Inject
+    private FeatureEvolutionPreparer featureEvolutionPreparer;
+    @Inject
+    private GeometryUtils geometryUtils;
 
-	@GET
-	@Path("{eventId}/{featureGroup}")
-	public Response getFeatureEvolution(@PathParam("eventId") long eventId,
-			@PathParam("featureGroup") long featureGroup) {
-		DateTime dateTime = DateTime.now();
-		long to = dateTime.getMillis();
-		long from = dateTime.minusDays(1).getMillis();
-		return getFeatureEvolution(eventId, featureGroup, from, to);
-	}
+    @GET
+    @Path("{eventId}/{featureGroup}")
+    public Response getFeatureEvolution(@PathParam("eventId") long eventId,
+            @PathParam("featureGroup") long featureGroup) {
+        DateTime dateTime = DateTime.now();
+        long to = dateTime.getMillis();
+        long from = dateTime.minusDays(1).getMillis();
+        return getFeatureEvolution(eventId, featureGroup, from, to);
+    }
 
-	@GET
-	@Path("{eventId}/{featureGroup}/{from}/{to}")
-	public Response getFeatureEvolution(@PathParam("eventId") long eventId,
-			@PathParam("featureGroup") long featureGroup, @PathParam("from") long from, @PathParam("to") long to) {
-		List<FeatureEvolution> featureEvolutions = findBetween(eventId, featureGroup, from, to);
-		List<FeatureEvolution> partitionedEvolutions = partitionAndCombine(featureEvolutions);
- 		List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
-				.prepareEvolution(partitionedEvolutions);
+    @GET
+    @Path("{eventId}/{featureGroup}/{from}/{to}")
+    public Response getFeatureEvolution(@PathParam("eventId") long eventId,
+            @PathParam("featureGroup") long featureGroup, @PathParam("from") long from, @PathParam("to") long to) {
+        List<FeatureEvolution> featureEvolutions = findBetween(eventId, featureGroup, from, to);
+        List<FeatureEvolution> partitionedEvolutions = partitionAndCombine(featureEvolutions);
+        List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEvolutionPreparer
+                .prepareEvolution(partitionedEvolutions);
 
-		return Response.ok(new GeoJsonFeatureCollection(geoJsonFeatureEvolutions)).build();
-	}
+        return Response.ok(new GeoJsonFeatureCollection(geoJsonFeatureEvolutions)).build();
+    }
 
-	private List<FeatureEvolution> findBetween(long eventId, long featureGroup, long from, long to) {
-		DateTime toDate = new DateTime(to);
-		DateTime fromDate = new DateTime(from);
-		return featureEvolutionService.findBetween(eventId, featureGroup, fromDate, toDate);
-	}
+    private List<FeatureEvolution> findBetween(long eventId, long featureGroup, long from, long to) {
+        DateTime toDate = new DateTime(to);
+        DateTime fromDate = new DateTime(from);
+        return featureEvolutionService.findBetween(eventId, featureGroup, fromDate, toDate);
+    }
 
-	private List<FeatureEvolution> partitionAndCombine(List<FeatureEvolution> featureEvolutions) {
-		Map<Long, FeatureEvolution> partitionedFeatureEvolutions = new HashMap<>();
+    private List<FeatureEvolution> partitionAndCombine(List<FeatureEvolution> featureEvolutions) {
+        Map<Long, FeatureEvolution> partitionedFeatureEvolutions = new HashMap<>();
 
-		for (FeatureEvolution featureEvolution : featureEvolutions) {
-			if (!(partitionedFeatureEvolutions.containsKey(featureEvolution.getFeatureGroup()))) {
-				partitionedFeatureEvolutions.put(featureEvolution.getFeatureGroup(), featureEvolution);
-			} else {
-				FeatureEvolution currentFeatureEvolution = partitionedFeatureEvolutions
-						.get(featureEvolution.getFeatureGroup());
-				GeometryCollection c = (GeometryCollection) currentFeatureEvolution.getGeometry();
-				if (featureEvolution.getStatus() == 'c') {
-					currentFeatureEvolution
-							.setGeometry(GeometryUtils.union((GeometryCollection) currentFeatureEvolution.getGeometry(),
-									(GeometryCollection) featureEvolution.getGeometry()));
-				} else {
-					currentFeatureEvolution.setGeometry(
-							GeometryUtils.difference((GeometryCollection) currentFeatureEvolution.getGeometry(),
-									featureEvolution.getGeometry().getGeometryN(0)));
-				}
-			}
-		}
-		return new ArrayList<FeatureEvolution>(partitionedFeatureEvolutions.values());
-	}
+        for (FeatureEvolution featureEvolution : featureEvolutions) {
+            if (!(partitionedFeatureEvolutions.containsKey(featureEvolution.getFeatureGroup()))) {
+                partitionedFeatureEvolutions.put(featureEvolution.getFeatureGroup(), featureEvolution);
+            } else {
+                FeatureEvolution currentFeatureEvolution = partitionedFeatureEvolutions
+                        .get(featureEvolution.getFeatureGroup());
+                if (featureEvolution.getStatus() == 'c') {
+                    currentFeatureEvolution
+                            .setGeometry(geometryUtils.union((GeometryCollection) currentFeatureEvolution.getGeometry(),
+                                    (GeometryCollection) featureEvolution.getGeometry()));
+                } else {
+                    currentFeatureEvolution.setGeometry(
+                            geometryUtils.difference((GeometryCollection) currentFeatureEvolution.getGeometry(),
+                                    featureEvolution.getGeometry().getGeometryN(0)));
+                }
+            }
+        }
+        return new ArrayList<FeatureEvolution>(partitionedFeatureEvolutions.values());
+    }
 }

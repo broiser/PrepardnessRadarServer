@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import at.jku.cis.radar.dao.EventDao;
-import at.jku.cis.radar.modelv2.Event;
+import at.jku.cis.radar.model.v2.Event;
 
 @ApplicationScoped
 public class EventService implements Serializable {
@@ -17,16 +17,16 @@ public class EventService implements Serializable {
     private EventDao eventDao;
 
     public Event findById(long id) {
-       return eventDao.findById(id);
+        return eventDao.findById(id);
     }
 
     public List<Event> findAll() {
         return eventDao.findAll();
     }
-    
+
     @Transactional
-    public void save(Event e){
-    	eventDao.save(e);
+    public void save(Event e) {
+        eventDao.save(e);
     }
 
 }
