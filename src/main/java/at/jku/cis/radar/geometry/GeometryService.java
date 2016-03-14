@@ -1,5 +1,6 @@
 package at.jku.cis.radar.geometry;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import com.vividsolutions.jts.geom.Polygonal;
 import com.vividsolutions.jts.geom.TopologyException;
 
 @ApplicationScoped
-public class GeometryUtils {
+public class GeometryService implements Serializable {
     private final static int MAX_UNION_TRIES = 100;
 
     @Inject

@@ -1,4 +1,4 @@
-package at.jku.cis.radar.rest;
+package at.jku.cis.radar.rest.v2;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

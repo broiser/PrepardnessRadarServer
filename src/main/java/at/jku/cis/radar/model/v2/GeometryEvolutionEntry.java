@@ -1,7 +1,10 @@
 package at.jku.cis.radar.model.v2;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +14,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -28,17 +32,20 @@ public class GeometryEvolutionEntry extends BaseEntity {
 
     @OneToMany(mappedBy = "geometryEvolutionEntry")
     @LazyCollection(LazyCollectionOption.FALSE)
-    private List<GeometryEntry> geometries;
+    private List<GeometryEntry> geometryEntries = new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
-    public List<GeometryEntry> getGeometries() {
-        return geometries;
+    @Transient
+    private Map<String, Object> properties = new HashMap<>();
+
+    public FeatureEntry getFeatureEntry() {
+        return featureEntry;
     }
 
-    public void setGeometries(List<GeometryEntry> geometries) {
-        this.geometries = geometries;
+    public void setFeatureEntry(FeatureEntry featureEntry) {
+        this.featureEntry = featureEntry;
     }
 
     public Date getDate() {
@@ -49,12 +56,19 @@ public class GeometryEvolutionEntry extends BaseEntity {
         this.date = date;
     }
 
-    public FeatureEntry getFeatureEntry() {
-        return featureEntry;
+    public List<GeometryEntry> getGeometryEntries() {
+        return geometryEntries;
     }
 
-    public void setFeatureEntry(FeatureEntry featureEntry) {
-        this.featureEntry = featureEntry;
+    public void setGeometryEntries(List<GeometryEntry> geometryEntries) {
+        this.geometryEntries = geometryEntries;
     }
 
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
 }

@@ -17,8 +17,7 @@ public class GeometryEvolutionEntryService implements Serializable {
     @Inject
     private GeometryEvolutionEntryDao geometryEvolutionEntryDao;
 
-    public List<GeometryEvolutionEntry> getGeometryEvolution(long eventId, DateTime fromDate, DateTime toDate) {
+    public List<GeometryEvolutionEntry> findGeometryEvolution(long eventId, DateTime fromDate, DateTime toDate) {
         return geometryEvolutionEntryDao.findEvolutionsByEvent(eventId, fromDate.toDate(), toDate.toDate());
     }
-
 }

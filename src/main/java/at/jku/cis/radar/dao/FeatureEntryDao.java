@@ -1,5 +1,6 @@
 package at.jku.cis.radar.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,6 +22,11 @@ public class FeatureEntryDao extends AbstractDao<FeatureEntry> {
         return getSingleResult(createNamedQuery(FeatureEntry.FIND_FEATURE_BY_FEATURE_GROUP)
                 .setParameter("featureGroup", featureGroup).setMaxResults(1));
 
+    }
+
+    public List<FeatureEntry> findAllByEvent(long eventId, Date fromDate, Date toDate) {
+        return createNamedQuery(FeatureEntry.FIND_ALL_BY_EVENT).setParameter("eventId", eventId)
+                .setParameter("fromDate", fromDate).setParameter("toDate", toDate).getResultList();
     }
 
 }
