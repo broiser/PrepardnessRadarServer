@@ -18,7 +18,7 @@ import org.hibernate.annotations.Type;
 import com.vividsolutions.jts.geom.Geometry;
 
 @Entity
-//@NamedQuery(name = GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID, query = "select ge from GeometryEntry ge where ge.geometryEvolutionEntry.id = :evolutionId order by ge.date")
+@NamedQuery(name = GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID, query = "select ge from GeometryEntry ge where ge.geometryEvolutionEntry.id = :evolutionId order by ge.date")
 
 public class GeometryEntry extends BaseEntity {
 
@@ -29,11 +29,9 @@ public class GeometryEntry extends BaseEntity {
 	@ManyToOne (cascade=CascadeType.ALL)
 	private GeometryEvolutionEntry geometryEvolutionEntry;
 	
-	@Transient
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
 	
-	@Transient
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@Column(name = "geometry", columnDefinition = "Geometry")
 	private Geometry geometry;
