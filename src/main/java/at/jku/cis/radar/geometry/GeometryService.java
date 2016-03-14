@@ -7,6 +7,8 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -22,29 +24,39 @@ public class GeometryService implements Serializable {
     private final static int MAX_UNION_TRIES = 100;
 
     @Inject
+    private Logger logger;
+    @Inject
     private PolygonRepairerService polygonRepairerService;
 
-    public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersection) {
+    public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersect) {
         List<Geometry> geometryList = new ArrayList<>();
         for (int i = 0; i < geometries.getNumGeometries(); i++) {
             Geometry geometry = geometries.getGeometryN(i);
             try {
-                if (geometry.intersects(geometryToIntersection)) {
-                    Geometry intersectionGeometry = geometry.difference(geometryToIntersection);
-                    if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
-                        geometryList
-                                .add(createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
-                    } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
-                        geometryList.add(
-                                createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
-                    }
-                } else {
-                    geometryList.add(geometry);
-                }
+                geometryList.addAll(difference(geometry, geometryToIntersect));
             } catch (TopologyException e) {
+                logger.error("Intersection failed.", e);
             }
         }
         return new GeometryCollection(geometryList.toArray(new Geometry[geometryList.size()]), new GeometryFactory());
+    }
+
+    private List<Geometry> difference(Geometry geometry, Geometry geometryToIntersect) {
+        List<Geometry> geometryList = new ArrayList<>();
+        for (int j = 0; j < geometryToIntersect.getNumGeometries(); j++) {
+            if (geometry.intersects(geometryToIntersect.getGeometryN(j))) {
+                Geometry intersectionGeometry = geometry.difference(geometryToIntersect.getGeometryN(j));
+                if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
+                    geometryList.add(createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
+                } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
+                    geometryList.add(
+                            createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
+                }
+            } else {
+                geometryList.add(geometry);
+            }
+        }
+        return geometryList;
     }
 
     private static MultiPolygon createMultiPolygon(List<Polygon> polygons) {
