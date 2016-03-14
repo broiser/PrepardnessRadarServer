@@ -31,10 +31,6 @@ public class FeatureEntryService implements Serializable {
     @Inject
     private GeometryEvolutionEntryService geometryEvolutionEntryService;
 
-    public List<FeatureEntry> getFeatureEntry(long eventId) {
-        return featureEntryDao.findFeaturesByEvent(eventId);
-    }
-
     public List<FeatureEntry> findAllByEvent(long eventId, DateTime from, DateTime to) {
         Event event = eventService.findById(eventId);
         if (event == null) {

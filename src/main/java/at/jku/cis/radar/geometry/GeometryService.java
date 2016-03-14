@@ -24,22 +24,25 @@ public class GeometryService implements Serializable {
     @Inject
     private PolygonRepairerService polygonRepairerService;
 
-    public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersection) {
+    public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersect) {
         List<Geometry> geometryList = new ArrayList<>();
         for (int i = 0; i < geometries.getNumGeometries(); i++) {
             Geometry geometry = geometries.getGeometryN(i);
             try {
-                if (geometry.intersects(geometryToIntersection)) {
-                    Geometry intersectionGeometry = geometry.difference(geometryToIntersection);
-                    if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
-                        geometryList
-                                .add(createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
-                    } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
-                        geometryList.add(
-                                createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
+
+                for (int j = 0; j < geometryToIntersect.getNumGeometries(); j++) {
+                    if (geometry.intersects(geometryToIntersect.getGeometryN(j))) {
+                        Geometry intersectionGeometry = geometry.difference(geometryToIntersect.getGeometryN(i));
+                        if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
+                            geometryList.add(
+                                    createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
+                        } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
+                            geometryList.add(createMultiPolygon(
+                                    polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
+                        }
+                    } else {
+                        geometryList.add(geometry);
                     }
-                } else {
-                    geometryList.add(geometry);
                 }
             } catch (TopologyException e) {
             }
