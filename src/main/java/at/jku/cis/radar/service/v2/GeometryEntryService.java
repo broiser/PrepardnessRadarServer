@@ -1,11 +1,14 @@
-package at.jku.cis.radar.service;
+package at.jku.cis.radar.service.v2;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+
+import org.joda.time.DateTime;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import at.jku.cis.radar.dao.GeometryEntryDao;
 import at.jku.cis.radar.model.v2.GeometryEntry;
@@ -16,17 +19,11 @@ public class GeometryEntryService implements Serializable {
     @Inject
     private GeometryEntryDao geometryEntryDao;
 
-    public List<GeometryEntry> getGeometryEntry(long geometryEvolutionId) {
-        return geometryEntryDao.findGeometriesByEvolutionId(geometryEvolutionId);
-    }
-
     @Transactional
-    public GeometryEntry save(GeometryEntry geometryEntry) {
-        return geometryEntryDao.save(geometryEntry);
-    }
-
-    @Transactional
-    public GeometryEntry create(GeometryEntry geometryEntry) {
+    public GeometryEntry create(Geometry geometry) {
+        GeometryEntry geometryEntry = new GeometryEntry();
+        geometryEntry.setGeometry(geometry);
+        geometryEntry.setDate(DateTime.now().toDate());
         return geometryEntryDao.create(geometryEntry);
     }
 

@@ -2,6 +2,7 @@ package at.jku.cis.radar.model.v2;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -25,8 +26,8 @@ public class FeatureEntry extends BaseEntity {
     @OneToOne
     private Event event;
     private long featureGroup;
-    @OneToMany(mappedBy = "featureEntry")
     @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "featureEntry", cascade = CascadeType.ALL)
     private List<GeometryEvolutionEntry> geometryEvolutionEntries;
 
     public Event getEvent() {

@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -22,7 +23,7 @@ public class GeometryEntry extends BaseEntity {
 
     public static final String FIND_GEOMETRIES_BY_EVOLUTION_ID = "GeometryEntry.findGeometriesByEvolutionId";
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private GeometryEvolutionEntry geometryEvolutionEntry;
 
     @Temporal(TemporalType.TIMESTAMP)

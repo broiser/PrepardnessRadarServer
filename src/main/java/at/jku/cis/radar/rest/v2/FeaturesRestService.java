@@ -22,13 +22,12 @@ import org.joda.time.DateTime;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
 import at.jku.cis.radar.model.v2.FeatureEntry;
-import at.jku.cis.radar.service.FeatureEntryService;
+import at.jku.cis.radar.service.v2.FeatureEntryService;
 import at.jku.cis.radar.transformer.v2.FeatureEntryGeoJsonFeatureTransformer;
 
 @Path("features")
 public class FeaturesRestService extends RestService {
 
-    private static final String MESSAGE = StringUtils.EMPTY;
     @Inject
     private FeatureEntryService featureEntryService;
     @Inject
@@ -62,13 +61,15 @@ public class FeaturesRestService extends RestService {
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response saveFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
-        throw new NotImplementedException(MESSAGE);
+        throw new NotImplementedException(StringUtils.EMPTY);
     }
 
     @POST
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response createFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
-        throw new NotImplementedException(MESSAGE);
+        FeatureEntry featureEntry = featureEntryService.create(eventId, geoJsonFeature.getGeometry(),
+                geoJsonFeature.getProperties());
+        return Response.ok(featureEntry.getFeatureGroup()).build();
     }
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -30,8 +31,8 @@ public class GeometryEvolutionEntry extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private FeatureEntry featureEntry;
 
-    @OneToMany(mappedBy = "geometryEvolutionEntry")
     @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "geometryEvolutionEntry", cascade = CascadeType.ALL)
     private List<GeometryEntry> geometryEntries = new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)

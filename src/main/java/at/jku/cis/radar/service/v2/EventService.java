@@ -1,4 +1,4 @@
-package at.jku.cis.radar.service;
+package at.jku.cis.radar.service.v2;
 
 import java.io.Serializable;
 import java.util.List;

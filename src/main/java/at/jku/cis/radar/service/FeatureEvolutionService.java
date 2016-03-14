@@ -16,6 +16,8 @@ import at.jku.cis.radar.dao.FeatureEvolutionDao;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.model.FeatureEvolution;
 import at.jku.cis.radar.model.v2.Event;
+import at.jku.cis.radar.service.v2.EventService;
+import at.jku.cis.radar.service.v2.FeatureGroupService;
 
 @ApplicationScoped
 public class FeatureEvolutionService implements Serializable {
