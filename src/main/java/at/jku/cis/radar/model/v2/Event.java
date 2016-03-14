@@ -29,8 +29,8 @@ public class Event extends BaseEntity {
     private boolean visible;
     @JsonIgnore
     private Period validationPeriod;
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Event> events;
 
     public Event() {

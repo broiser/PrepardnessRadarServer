@@ -1,56 +1,70 @@
 package at.jku.cis.radar.geometry;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.Polygonal;
 import com.vividsolutions.jts.geom.TopologyException;
 
 @ApplicationScoped
-public class GeometryUtils {
+public class GeometryService implements Serializable {
     private final static int MAX_UNION_TRIES = 100;
 
     @Inject
+    private Logger logger;
+    @Inject
+    private GeometryFactory geometryFactory;
+    @Inject
     private PolygonRepairerService polygonRepairerService;
 
-    public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersection) {
+    public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersect) {
         List<Geometry> geometryList = new ArrayList<>();
         for (int i = 0; i < geometries.getNumGeometries(); i++) {
             Geometry geometry = geometries.getGeometryN(i);
             try {
-                if (geometry.intersects(geometryToIntersection)) {
-                    Geometry intersectionGeometry = geometry.difference(geometryToIntersection);
-                    if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
-                        geometryList
-                                .add(createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
-                    } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
-                        geometryList.add(
-                                createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
-                    }
-                } else {
-                    geometryList.add(geometry);
-                }
+                geometryList.addAll(difference(geometry, geometryToIntersect));
             } catch (TopologyException e) {
+                logger.error("Intersection failed.", e);
             }
         }
-        return new GeometryCollection(geometryList.toArray(new Geometry[geometryList.size()]), new GeometryFactory());
+        return new GeometryCollection(geometryList.toArray(new Geometry[geometryList.size()]), geometryFactory);
     }
 
-    private static MultiPolygon createMultiPolygon(List<Polygon> polygons) {
-        return new GeometryFactory().createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+    private List<Geometry> difference(Geometry geometry, Geometry geometryToIntersect) {
+        List<Geometry> geometryList = new ArrayList<>();
+        for (int j = 0; j < geometryToIntersect.getNumGeometries(); j++) {
+            if (geometry.intersects(geometryToIntersect.getGeometryN(j))) {
+                Geometry intersectionGeometry = geometry.difference(geometryToIntersect.getGeometryN(j));
+                if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
+                    geometryList.add(createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
+                } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
+                    geometryList.add(
+                            createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
+                }
+            } else {
+                geometryList.add(geometry);
+            }
+        }
+        return geometryList;
     }
 
-    public static boolean intersects(GeometryCollection geometryCollection, Geometry intersectionGeometry) {
+    private MultiPolygon createMultiPolygon(List<Polygon> polygons) {
+        return geometryFactory.createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+    }
+
+    public boolean intersects(GeometryCollection geometryCollection, Geometry intersectionGeometry) {
         for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
             if (geometryCollection.getGeometryN(i).intersects(intersectionGeometry)) {
                 return true;
@@ -68,7 +82,7 @@ public class GeometryUtils {
             geometries[i + collection1.getNumGeometries()] = collection2.getGeometryN(i);
         }
 
-        return union(new GeometryCollection(geometries, new GeometryFactory()));
+        return union(new GeometryCollection(geometries, geometryFactory));
     }
 
     public GeometryCollection union(GeometryCollection geometryCollection) {
@@ -89,8 +103,7 @@ public class GeometryUtils {
                 } else if (geometry instanceof MultiPolygon) {
                     polygons = polygonRepairerService.repair((MultiPolygon) geometry);
                 }
-                collection = new GeometryFactory()
-                        .createGeometryCollection(polygons.toArray(new Polygon[polygons.size()]));
+                collection = geometryFactory.createGeometryCollection(polygons.toArray(new Polygon[polygons.size()]));
             } else if (geometry instanceof GeometryCollection) {
                 collection = repairGeometryCollection(((GeometryCollection) geometry));
             }
@@ -117,7 +130,7 @@ public class GeometryUtils {
             }
             geometries[i] = geometry1;
         }
-        return new GeometryCollection(geometries, new GeometryFactory());
+        return new GeometryCollection(geometries, geometryFactory);
     }
 
     private boolean selfIntersection(GeometryCollection geometryCollection) {
@@ -138,14 +151,12 @@ public class GeometryUtils {
                     && ((Polygon) geometryCollection.getGeometryN(i)).getNumInteriorRing() > 0) {
                 Coordinate[] coordinates = ((Polygon) geometryCollection.getGeometryN(i)).getExteriorRing()
                         .getCoordinates();
-                LinearRing linearRing = new GeometryFactory().createLinearRing(coordinates);
-                newGeometryList.add(new GeometryFactory().createPolygon(linearRing));
+                newGeometryList.add(geometryFactory.createPolygon(geometryFactory.createLinearRing(coordinates)));
             } else {
                 newGeometryList.add(geometryCollection.getGeometryN(i));
             }
         }
-        return new GeometryFactory()
-                .createGeometryCollection(newGeometryList.toArray(new Geometry[newGeometryList.size()]));
+        return geometryFactory.createGeometryCollection(newGeometryList.toArray(new Geometry[newGeometryList.size()]));
     }
 
     private GeometryCollection repairGeometryCollection(GeometryCollection collection) {
@@ -159,6 +170,6 @@ public class GeometryUtils {
                 geometries.add(collection.getGeometryN(i));
             }
         }
-        return new GeometryFactory().createGeometryCollection(geometries.toArray(new Geometry[geometries.size()]));
+        return geometryFactory.createGeometryCollection(geometries.toArray(new Geometry[geometries.size()]));
     }
 }

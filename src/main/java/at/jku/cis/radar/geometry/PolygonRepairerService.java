@@ -4,6 +4,7 @@ import static com.vividsolutions.jts.operation.valid.TopologyValidationError.DIS
 import static com.vividsolutions.jts.operation.valid.TopologyValidationError.RING_SELF_INTERSECTION;
 import static com.vividsolutions.jts.operation.valid.TopologyValidationError.SELF_INTERSECTION;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +19,7 @@ import com.vividsolutions.jts.operation.valid.IsValidOp;
 import com.vividsolutions.jts.operation.valid.TopologyValidationError;
 
 @ApplicationScoped
-public class PolygonRepairerService {
+public class PolygonRepairerService implements Serializable {
 
     public List<Polygon> repair(MultiPolygon multiPolygon) {
         ArrayList<Polygon> polygons = new ArrayList<>();

@@ -17,8 +17,9 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
 import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
-import at.jku.cis.radar.geometry.GeometryUtils;
+import at.jku.cis.radar.geometry.GeometryService;
 import at.jku.cis.radar.model.FeatureEvolution;
+import at.jku.cis.radar.rest.v2.RestService;
 import at.jku.cis.radar.service.FeatureEvolutionPreparer;
 import at.jku.cis.radar.service.FeatureEvolutionService;
 
@@ -30,7 +31,7 @@ public class FeatureEvolutionRestService extends RestService {
     @Inject
     private FeatureEvolutionPreparer featureEvolutionPreparer;
     @Inject
-    private GeometryUtils geometryUtils;
+    private GeometryService geometryService;
 
     @GET
     @Path("{eventId}/{featureGroup}")
@@ -71,11 +72,11 @@ public class FeatureEvolutionRestService extends RestService {
                         .get(featureEvolution.getFeatureGroup());
                 if (featureEvolution.getStatus() == 'c') {
                     currentFeatureEvolution
-                            .setGeometry(geometryUtils.union((GeometryCollection) currentFeatureEvolution.getGeometry(),
+                            .setGeometry(geometryService.union((GeometryCollection) currentFeatureEvolution.getGeometry(),
                                     (GeometryCollection) featureEvolution.getGeometry()));
                 } else {
                     currentFeatureEvolution.setGeometry(
-                            geometryUtils.difference((GeometryCollection) currentFeatureEvolution.getGeometry(),
+                            geometryService.difference((GeometryCollection) currentFeatureEvolution.getGeometry(),
                                     featureEvolution.getGeometry().getGeometryN(0)));
                 }
             }

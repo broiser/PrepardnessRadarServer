@@ -1,11 +1,10 @@
-package at.jku.cis.radar.service;
+package at.jku.cis.radar.service.v2;
 
 import java.io.Serializable;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import at.jku.cis.radar.dao.EventDao;
 import at.jku.cis.radar.model.v2.Event;
@@ -23,10 +22,4 @@ public class EventService implements Serializable {
     public List<Event> findAll() {
         return eventDao.findAll();
     }
-
-    @Transactional
-    public void save(Event e) {
-        eventDao.save(e);
-    }
-
 }
