@@ -13,7 +13,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.Polygonal;
@@ -25,6 +24,8 @@ public class GeometryService implements Serializable {
 
     @Inject
     private Logger logger;
+    @Inject
+    private GeometryFactory geometryFactory;
     @Inject
     private PolygonRepairerService polygonRepairerService;
 
@@ -38,7 +39,7 @@ public class GeometryService implements Serializable {
                 logger.error("Intersection failed.", e);
             }
         }
-        return new GeometryCollection(geometryList.toArray(new Geometry[geometryList.size()]), new GeometryFactory());
+        return new GeometryCollection(geometryList.toArray(new Geometry[geometryList.size()]), geometryFactory);
     }
 
     private List<Geometry> difference(Geometry geometry, Geometry geometryToIntersect) {
@@ -59,11 +60,11 @@ public class GeometryService implements Serializable {
         return geometryList;
     }
 
-    private static MultiPolygon createMultiPolygon(List<Polygon> polygons) {
-        return new GeometryFactory().createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+    private MultiPolygon createMultiPolygon(List<Polygon> polygons) {
+        return geometryFactory.createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
     }
 
-    public static boolean intersects(GeometryCollection geometryCollection, Geometry intersectionGeometry) {
+    public boolean intersects(GeometryCollection geometryCollection, Geometry intersectionGeometry) {
         for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
             if (geometryCollection.getGeometryN(i).intersects(intersectionGeometry)) {
                 return true;
@@ -81,7 +82,7 @@ public class GeometryService implements Serializable {
             geometries[i + collection1.getNumGeometries()] = collection2.getGeometryN(i);
         }
 
-        return union(new GeometryCollection(geometries, new GeometryFactory()));
+        return union(new GeometryCollection(geometries, geometryFactory));
     }
 
     public GeometryCollection union(GeometryCollection geometryCollection) {
@@ -102,8 +103,7 @@ public class GeometryService implements Serializable {
                 } else if (geometry instanceof MultiPolygon) {
                     polygons = polygonRepairerService.repair((MultiPolygon) geometry);
                 }
-                collection = new GeometryFactory()
-                        .createGeometryCollection(polygons.toArray(new Polygon[polygons.size()]));
+                collection = geometryFactory.createGeometryCollection(polygons.toArray(new Polygon[polygons.size()]));
             } else if (geometry instanceof GeometryCollection) {
                 collection = repairGeometryCollection(((GeometryCollection) geometry));
             }
@@ -130,7 +130,7 @@ public class GeometryService implements Serializable {
             }
             geometries[i] = geometry1;
         }
-        return new GeometryCollection(geometries, new GeometryFactory());
+        return new GeometryCollection(geometries, geometryFactory);
     }
 
     private boolean selfIntersection(GeometryCollection geometryCollection) {
@@ -151,14 +151,12 @@ public class GeometryService implements Serializable {
                     && ((Polygon) geometryCollection.getGeometryN(i)).getNumInteriorRing() > 0) {
                 Coordinate[] coordinates = ((Polygon) geometryCollection.getGeometryN(i)).getExteriorRing()
                         .getCoordinates();
-                LinearRing linearRing = new GeometryFactory().createLinearRing(coordinates);
-                newGeometryList.add(new GeometryFactory().createPolygon(linearRing));
+                newGeometryList.add(geometryFactory.createPolygon(geometryFactory.createLinearRing(coordinates)));
             } else {
                 newGeometryList.add(geometryCollection.getGeometryN(i));
             }
         }
-        return new GeometryFactory()
-                .createGeometryCollection(newGeometryList.toArray(new Geometry[newGeometryList.size()]));
+        return geometryFactory.createGeometryCollection(newGeometryList.toArray(new Geometry[newGeometryList.size()]));
     }
 
     private GeometryCollection repairGeometryCollection(GeometryCollection collection) {
@@ -172,6 +170,6 @@ public class GeometryService implements Serializable {
                 geometries.add(collection.getGeometryN(i));
             }
         }
-        return new GeometryFactory().createGeometryCollection(geometries.toArray(new Geometry[geometries.size()]));
+        return geometryFactory.createGeometryCollection(geometries.toArray(new Geometry[geometries.size()]));
     }
 }
