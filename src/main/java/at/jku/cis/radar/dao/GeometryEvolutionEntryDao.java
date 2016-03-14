@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import at.jku.cis.radar.modelv2.GeometryEvolutionEntry;
+import at.jku.cis.radar.model.v2.GeometryEvolutionEntry;
 
 @ApplicationScoped
 public class GeometryEvolutionEntryDao extends AbstractDao<GeometryEvolutionEntry> {

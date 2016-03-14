@@ -1,42 +1,37 @@
-package at.jku.cis.radar.modelv2;
+package at.jku.cis.radar.model.v2;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+// @NamedQuery(name = GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID, query =
+// "select ge from GeometryEntry ge where ge.geometryEvolutionEntry.id =
+// :evolutionId order by ge.date")
 @Entity
-@NamedQuery(name = GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID, query = "select ge from GeometryEntry ge where ge.geometryEvolutionEntry.id = :evolutionId order by ge.date")
-
 public class GeometryEntry extends BaseEntity {
 
-	
 	public static final String FIND_GEOMETRIES_BY_EVOLUTION_ID = "GeometryEntry.findGeometriesByEvolutionId";
 
-	
-	@ManyToOne (cascade=CascadeType.ALL)
+	@ManyToOne
 	private GeometryEvolutionEntry geometryEvolutionEntry;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
-	
+
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@Column(name = "geometry", columnDefinition = "Geometry")
 	private Geometry geometry;
 
-	@Transient
 	@Enumerated(EnumType.STRING)
 	private GeometryStatus status;
 
@@ -72,6 +67,4 @@ public class GeometryEntry extends BaseEntity {
 		this.geometryEvolutionEntry = geometryEvolutionEntry;
 	}
 
-	
-	
 }

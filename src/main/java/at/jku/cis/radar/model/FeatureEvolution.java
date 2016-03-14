@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -18,9 +17,10 @@ import org.hibernate.annotations.Type;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import at.jku.cis.radar.modelv2.BaseEntity;
-import at.jku.cis.radar.modelv2.Event;
+import at.jku.cis.radar.model.v2.BaseEntity;
+import at.jku.cis.radar.model.v2.Event;
 
+//@Entity
 @NamedQueries({
         @NamedQuery(name = FeatureEvolution.FIND_NEWEST_BY_FEATURE_GROUP, query = "SELECT fe FROM FeatureEvolution fe where fe.event.id = :eventId AND fe.featureGroup = :featureGroup ORDER By fe.date DESC"),
         @NamedQuery(name = FeatureEvolution.FIND_BETWEEN_BY_EVENT_AND_FEATURE_GROUP, query = "SELECT fe FROM FeatureEvolution fe WHERE fe.event.id = :eventId AND fe.featureGroup = :featureGroup AND fe.date BETWEEN :fromDate AND :toDate ORDER BY fe.date") })
@@ -83,11 +83,11 @@ public class FeatureEvolution extends BaseEntity {
         this.properties = properties;
     }
 
-	public char getStatus() {
-		return status;
-	}
+    public char getStatus() {
+        return status;
+    }
 
-	public void setStatus(char status) {
-		this.status = status;
-	}
+    public void setStatus(char status) {
+        this.status = status;
+    }
 }

@@ -11,7 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import at.jku.cis.radar.modelv2.BaseEntity;
+import at.jku.cis.radar.model.v2.BaseEntity;
 
 public class AbstractDao<T extends BaseEntity> implements Serializable {
 

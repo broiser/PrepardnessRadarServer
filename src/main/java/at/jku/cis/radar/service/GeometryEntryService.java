@@ -8,8 +8,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import at.jku.cis.radar.dao.GeometryEntryDao;
-import at.jku.cis.radar.modelv2.GeometryEntry;
-
+import at.jku.cis.radar.model.v2.GeometryEntry;
 
 @ApplicationScoped
 public class GeometryEntryService implements Serializable {
@@ -30,5 +29,5 @@ public class GeometryEntryService implements Serializable {
 	public GeometryEntry create(GeometryEntry geometryEntry) {
 		return geometryEntryDao.create(geometryEntry);
 	}
-	
+
 }

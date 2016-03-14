@@ -1,4 +1,4 @@
-package at.jku.cis.radar.modelv2;
+package at.jku.cis.radar.model.v2;
 
 import java.util.List;
 

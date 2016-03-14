@@ -10,8 +10,7 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 
 import at.jku.cis.radar.dao.GeometryEvolutionEntryDao;
-import at.jku.cis.radar.modelv2.GeometryEvolutionEntry;
-
+import at.jku.cis.radar.model.v2.GeometryEvolutionEntry;
 
 @ApplicationScoped
 public class GeometryEvolutionEntryService implements Serializable {
@@ -27,7 +26,7 @@ public class GeometryEvolutionEntryService implements Serializable {
 	public GeometryEvolutionEntry save(GeometryEvolutionEntry geometryEvolutionEntry) {
 		return geometryEvolutionEntryDao.save(geometryEvolutionEntry);
 	}
-	
+
 	@Transactional
 	public GeometryEvolutionEntry create(GeometryEvolutionEntry geometryEvolutionEntry) {
 		return geometryEvolutionEntryDao.create(geometryEvolutionEntry);

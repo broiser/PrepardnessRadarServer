@@ -4,18 +4,18 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import at.jku.cis.radar.modelv2.GeometryEntry;
+import at.jku.cis.radar.model.v2.GeometryEntry;
 
 @ApplicationScoped
 public class GeometryEntryDao extends AbstractDao<GeometryEntry> {
 
-	public GeometryEntryDao() {
-		super(GeometryEntry.class);
-	}
+    public GeometryEntryDao() {
+        super(GeometryEntry.class);
+    }
 
-	public List<GeometryEntry> findGeometriesByEvolutionId(long evolutionId) {
-		return createNamedQuery(GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID).setParameter("evolutionId", evolutionId)
-				.getResultList();
-	}
+    public List<GeometryEntry> findGeometriesByEvolutionId(long evolutionId) {
+        return createNamedQuery(GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID).setParameter("evolutionId", evolutionId)
+                .getResultList();
+    }
 
 }
