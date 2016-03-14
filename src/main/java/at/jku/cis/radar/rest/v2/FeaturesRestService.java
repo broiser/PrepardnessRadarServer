@@ -15,8 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import at.jku.cis.radar.geojson.GeoJsonFeature;
@@ -51,25 +49,41 @@ public class FeaturesRestService extends RestService {
         return Response.ok(buildGeoJsonFeatureCollection(featureEntries)).build();
     }
 
-    private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEntry> featureEntries) {
-        Collection<GeoJsonFeature> geoJsonFeatures = CollectionUtils.collect(featureEntries,
-                featureEntryGeoJsonFeatureTransformer);
-        return new GeoJsonFeatureCollection(new ArrayList<GeoJsonFeature>(geoJsonFeatures));
-    }
 
     @PUT
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response saveFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
-        throw new NotImplementedException(StringUtils.EMPTY);
+    public Response editFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
+        FeatureEntry featureEntry = editFeatureEntry(geoJsonFeature);
+        return Response.ok(featureEntry.getFeatureGroup()).build();
     }
 
     @POST
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response createFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
-        FeatureEntry featureEntry = featureEntryService.create(eventId, geoJsonFeature.getGeometry(),
-                geoJsonFeature.getProperties());
+        FeatureEntry featureEntry = geoJsonFeature.getFeatureGroup() < 1 ? createFeatureEntry(eventId, geoJsonFeature)
+                : evolveFeatureEntry(geoJsonFeature);
         return Response.ok(featureEntry.getFeatureGroup()).build();
+    }
+
+    private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEntry> featureEntries) {
+        Collection<GeoJsonFeature> geoJsonFeatures = CollectionUtils.collect(featureEntries,
+                featureEntryGeoJsonFeatureTransformer);
+        return new GeoJsonFeatureCollection(new ArrayList<GeoJsonFeature>(geoJsonFeatures));
+    }
+
+    private FeatureEntry createFeatureEntry(long eventId, GeoJsonFeature geoJsonFeature) {
+        return featureEntryService.create(eventId, geoJsonFeature.getGeometry(), geoJsonFeature.getProperties());
+    }
+
+    private FeatureEntry editFeatureEntry(GeoJsonFeature geoJsonFeature) {
+        long featureGroup = geoJsonFeature.getFeatureGroup();
+        return featureEntryService.edit(featureGroup, geoJsonFeature.getGeometry(), geoJsonFeature.getProperties());
+    }
+
+    private FeatureEntry evolveFeatureEntry(GeoJsonFeature geoJsonFeature) {
+        long featureGroup = geoJsonFeature.getFeatureGroup();
+        return featureEntryService.evolve(featureGroup, geoJsonFeature.getGeometry(), geoJsonFeature.getProperties());
     }
 }

@@ -12,6 +12,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import at.jku.cis.radar.dao.GeometryEntryDao;
 import at.jku.cis.radar.model.v2.GeometryEntry;
+import at.jku.cis.radar.model.v2.GeometryEvolutionEntry;
+import at.jku.cis.radar.model.v2.GeometryStatus;
 
 @ApplicationScoped
 public class GeometryEntryService implements Serializable {
@@ -20,11 +22,12 @@ public class GeometryEntryService implements Serializable {
     private GeometryEntryDao geometryEntryDao;
 
     @Transactional
-    public GeometryEntry create(Geometry geometry) {
+    public GeometryEntry create(GeometryEvolutionEntry geometryEvolutionEntry, Geometry geometry, GeometryStatus status) {
         GeometryEntry geometryEntry = new GeometryEntry();
         geometryEntry.setGeometry(geometry);
+        geometryEntry.setStatus(status);
+        geometryEntry.setGeometryEvolutionEntry(geometryEvolutionEntry);
         geometryEntry.setDate(DateTime.now().toDate());
         return geometryEntryDao.create(geometryEntry);
     }
-
 }

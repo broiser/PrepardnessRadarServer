@@ -18,7 +18,7 @@ public class FeatureEntryDao extends AbstractDao<FeatureEntry> {
         return createNamedQuery(FeatureEntry.FIND_FEATURE_BY_EVENT).setParameter("eventId", eventId).getResultList();
     }
 
-    public FeatureEntry findFeatureByFeatureGroup(long featureGroup) {
+    public FeatureEntry findByFeatureGroup(long featureGroup) {
         return getSingleResult(createNamedQuery(FeatureEntry.FIND_FEATURE_BY_FEATURE_GROUP)
                 .setParameter("featureGroup", featureGroup).setMaxResults(1));
 

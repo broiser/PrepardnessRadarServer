@@ -60,7 +60,7 @@ public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<Featur
                 }
             }
         }
-        return null;
+        return geometryCollection;
     }
 
     private GeometryCollection differenceGeometries(GeometryCollection geometryCollection,
