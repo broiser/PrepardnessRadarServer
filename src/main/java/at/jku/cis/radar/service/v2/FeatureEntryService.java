@@ -22,65 +22,69 @@ import at.jku.cis.radar.model.v2.GeometryEvolutionEntry;
 @ApplicationScoped
 public class FeatureEntryService implements Serializable {
 
-    @Inject
-    private FeatureEntryDao featureEntryDao;
-    @Inject
-    private EventService eventService;
-    @Inject
-    private FeatureGroupService featureGroupService;
-    @Inject
-    private GeometryEvolutionEntryService geometryEvolutionEntryService;
+	@Inject
+	private FeatureEntryDao featureEntryDao;
+	@Inject
+	private EventService eventService;
+	@Inject
+	private FeatureGroupService featureGroupService;
+	@Inject
+	private GeometryEvolutionEntryService geometryEvolutionEntryService;
 
-    public List<FeatureEntry> findAllByEvent(long eventId, DateTime from, DateTime to) {
-        Event event = eventService.findById(eventId);
-        if (event == null) {
-            return Collections.emptyList();
-        }
-        return findAllByEvent(event, from, to);
-    }
+	public List<FeatureEntry> findAllByEvent(long eventId, DateTime from, DateTime to) {
+		Event event = eventService.findById(eventId);
+		if (event == null) {
+			return Collections.emptyList();
+		}
+		return findAllByEvent(event, from, to);
+	}
 
-    private List<FeatureEntry> findAllByEvent(Event event, DateTime from, DateTime to) {
-        DateTime fromDate = from.minus(event.getValidationPeriod());
-        return featureEntryDao.findAllByEvent(event.getId(), fromDate.toDate(), to.toDate());
-    }
+	private List<FeatureEntry> findAllByEvent(Event event, DateTime from, DateTime to) {
+		DateTime fromDate = from.minus(event.getValidationPeriod());
+		return featureEntryDao.findAllByEvent(event.getId(), fromDate.toDate(), to.toDate());
+	}
 
-    @Transactional
-    public FeatureEntry create(long eventId, Geometry geometry, Map<String, Object> properties) {
-        FeatureEntry featureEntry = new FeatureEntry();
-        featureEntry.setEvent(eventService.findById(eventId));
-        featureEntry.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
-        featureEntry.setGeometryEvolutionEntries(new ArrayList<GeometryEvolutionEntry>());
-        featureEntry = featureEntryDao.create(featureEntry);
-        featureEntry.getGeometryEvolutionEntries()
-                .add(createGeometryEvolutionEntry(featureEntry, geometry, properties));
-        return featureEntryDao.save(featureEntry);
-    }
+	public FeatureEntry findByFeatureGroup(long featureGroup) {
+		return featureEntryDao.findByFeatureGroup(featureGroup);
+	}
 
-    @Transactional
-    public FeatureEntry evolve(long featureGroup, Geometry geometry, Map<String, Object> properties) {
-        FeatureEntry featureEntry = featureEntryDao.findByFeatureGroup(featureGroup);
-        featureEntry.getGeometryEvolutionEntries()
-                .add(createGeometryEvolutionEntry(featureEntry, geometry, properties));
-        return featureEntryDao.save(featureEntry);
-    }
+	@Transactional
+	public FeatureEntry create(long eventId, Geometry geometry, Map<String, Object> properties) {
+		FeatureEntry featureEntry = new FeatureEntry();
+		featureEntry.setEvent(eventService.findById(eventId));
+		featureEntry.setFeatureGroup(featureGroupService.generateNextFeatureGroup());
+		featureEntry.setGeometryEvolutionEntries(new ArrayList<GeometryEvolutionEntry>());
+		featureEntry = featureEntryDao.create(featureEntry);
+		featureEntry.getGeometryEvolutionEntries()
+				.add(createGeometryEvolutionEntry(featureEntry, geometry, properties));
+		return featureEntryDao.save(featureEntry);
+	}
 
-    @Transactional
-    public FeatureEntry edit(long featureGroup, Geometry geometry, Map<String, Object> properties) {
-        FeatureEntry featureEntry = featureEntryDao.findByFeatureGroup(featureGroup);
-        GeometryEvolutionEntry geometryEvolutionEntry = featureEntry.getGeometryEvolutionEntries()
-                .remove(featureEntry.getGeometryEvolutionEntries().size() - 1);
-        featureEntry.getGeometryEvolutionEntries()
-                .add(editGeometryEvolutionEntry(geometryEvolutionEntry.getId(), geometry, properties));
-        return featureEntryDao.save(featureEntry);
-    }
+	@Transactional
+	public FeatureEntry evolve(long featureGroup, Geometry geometry, Map<String, Object> properties) {
+		FeatureEntry featureEntry = featureEntryDao.findByFeatureGroup(featureGroup);
+		featureEntry.getGeometryEvolutionEntries()
+				.add(createGeometryEvolutionEntry(featureEntry, geometry, properties));
+		return featureEntryDao.save(featureEntry);
+	}
 
-    private GeometryEvolutionEntry editGeometryEvolutionEntry(long geometryEvolutionId, Geometry geometry,
-            Map<String, Object> properties) {
-        return geometryEvolutionEntryService.edit(geometryEvolutionId, geometry, properties);
-    }
+	@Transactional
+	public FeatureEntry edit(long featureGroup, Geometry geometry, Map<String, Object> properties) {
+		FeatureEntry featureEntry = featureEntryDao.findByFeatureGroup(featureGroup);
+		GeometryEvolutionEntry geometryEvolutionEntry = featureEntry.getGeometryEvolutionEntries()
+				.remove(featureEntry.getGeometryEvolutionEntries().size() - 1);
+		featureEntry.getGeometryEvolutionEntries()
+				.add(editGeometryEvolutionEntry(geometryEvolutionEntry.getId(), geometry, properties));
+		return featureEntryDao.save(featureEntry);
+	}
 
-    private GeometryEvolutionEntry createGeometryEvolutionEntry(FeatureEntry featureEntry, Geometry geometry,
-            Map<String, Object> properties) {
-        return geometryEvolutionEntryService.create(featureEntry, geometry, properties);
-    }
+	private GeometryEvolutionEntry editGeometryEvolutionEntry(long geometryEvolutionId, Geometry geometry,
+			Map<String, Object> properties) {
+		return geometryEvolutionEntryService.edit(geometryEvolutionId, geometry, properties);
+	}
+
+	private GeometryEvolutionEntry createGeometryEvolutionEntry(FeatureEntry featureEntry, Geometry geometry,
+			Map<String, Object> properties) {
+		return geometryEvolutionEntryService.create(featureEntry, geometry, properties);
+	}
 }

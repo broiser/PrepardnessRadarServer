@@ -24,10 +24,8 @@ public class GeometryService implements Serializable {
 
     @Inject
     private Logger logger;
-    @Inject
-    private GeometryFactory geometryFactory;
-    @Inject
-    private PolygonRepairerService polygonRepairerService;
+    private GeometryFactory geometryFactory = new GeometryFactory();
+    private PolygonRepairerService polygonRepairerService = new PolygonRepairerService();
 
     public GeometryCollection difference(GeometryCollection geometries, Geometry geometryToIntersect) {
         List<Geometry> geometryList = new ArrayList<>();
