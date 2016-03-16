@@ -1,4 +1,4 @@
-package at.jku.cis.radar.transformer.v2;
+package at.jku.cis.radar.transformer;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,11 +16,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 import at.jku.cis.radar.builder.GeoJsonFeatureBuilder;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
-import at.jku.cis.radar.geometry.GeometryService;
-import at.jku.cis.radar.model.v2.FeatureEntry;
-import at.jku.cis.radar.model.v2.GeometryEntry;
-import at.jku.cis.radar.model.v2.GeometryEvolutionEntry;
-import at.jku.cis.radar.model.v2.GeometryStatus;
+import at.jku.cis.radar.model.FeatureEntry;
+import at.jku.cis.radar.model.GeometryEntry;
+import at.jku.cis.radar.model.GeometryEvolutionEntry;
+import at.jku.cis.radar.service.GeometryService;
 
 @ApplicationScoped
 public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<FeatureEntry, GeoJsonFeature> {
@@ -53,14 +52,21 @@ public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<Featur
         GeometryCollection geometryCollection = createEmptyGeometryCollection();
         for (GeometryEvolutionEntry geometryEvolutionEntry : geometryEvolutionEntries) {
             for (GeometryEntry geometryEntry : geometryEvolutionEntry.getGeometryEntries()) {
-                if (GeometryStatus.CREATED == geometryEntry.getStatus()) {
-                    geometryCollection = unionGeometries(geometryCollection, geometryEntry);
-                } else {
-                    geometryCollection = differenceGeometries(geometryCollection, geometryEntry);
-                }
+                geometryCollection = combineGeometry(geometryCollection, geometryEntry);
             }
         }
         return geometryCollection;
+    }
+
+    private GeometryCollection combineGeometry(GeometryCollection geometryCollection, GeometryEntry geometryEntry) {
+        switch (geometryEntry.getStatus()) {
+        case CREATED:
+            return unionGeometries(geometryCollection, geometryEntry);
+        case ERASED:
+            return differenceGeometries(geometryCollection, geometryEntry);
+        default:
+            throw new IllegalArgumentException("Status doesn't exist.");
+        }
     }
 
     private GeometryCollection differenceGeometries(GeometryCollection geometryCollection,

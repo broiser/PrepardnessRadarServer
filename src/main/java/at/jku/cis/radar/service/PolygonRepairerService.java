@@ -1,4 +1,4 @@
-package at.jku.cis.radar.geometry;
+package at.jku.cis.radar.service;
 
 import static com.vividsolutions.jts.operation.valid.TopologyValidationError.DISCONNECTED_INTERIOR;
 import static com.vividsolutions.jts.operation.valid.TopologyValidationError.RING_SELF_INTERSECTION;

@@ -1,4 +1,4 @@
-package at.jku.cis.radar.rest.v2;
+package at.jku.cis.radar.rest;
 
 import java.io.Serializable;
 

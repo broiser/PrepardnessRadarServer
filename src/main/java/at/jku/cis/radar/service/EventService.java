@@ -1,4 +1,4 @@
-package at.jku.cis.radar.service.v2;
+package at.jku.cis.radar.service;
 
 import java.io.Serializable;
 import java.util.List;
@@ -7,7 +7,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import at.jku.cis.radar.dao.EventDao;
-import at.jku.cis.radar.model.v2.Event;
+import at.jku.cis.radar.model.Event;
 
 @ApplicationScoped
 public class EventService implements Serializable {

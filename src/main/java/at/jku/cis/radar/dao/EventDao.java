@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import at.jku.cis.radar.model.v2.Event;
+import at.jku.cis.radar.model.Event;
 
 @ApplicationScoped
 public class EventDao extends AbstractDao<Event> {

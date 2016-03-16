@@ -1,4 +1,4 @@
-package at.jku.cis.radar.service.v2;
+package at.jku.cis.radar.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,10 +13,10 @@ import org.joda.time.DateTime;
 import com.vividsolutions.jts.geom.Geometry;
 
 import at.jku.cis.radar.dao.GeometryEvolutionEntryDao;
-import at.jku.cis.radar.model.v2.FeatureEntry;
-import at.jku.cis.radar.model.v2.GeometryEntry;
-import at.jku.cis.radar.model.v2.GeometryEvolutionEntry;
-import at.jku.cis.radar.model.v2.GeometryStatus;
+import at.jku.cis.radar.model.FeatureEntry;
+import at.jku.cis.radar.model.GeometryEntry;
+import at.jku.cis.radar.model.GeometryEvolutionEntry;
+import at.jku.cis.radar.model.GeometryStatus;
 
 @ApplicationScoped
 public class GeometryEvolutionEntryService implements Serializable {

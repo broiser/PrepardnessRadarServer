@@ -5,12 +5,12 @@
 	<persistence-unit name="crowdSA" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/crowdSA</jta-data-source>
-		<class>at.jku.cis.radar.model.v2.BaseEntity</class>
-		<class>at.jku.cis.radar.model.v2.Event</class>
-		<class>at.jku.cis.radar.model.v2.Action</class>
-		<class>at.jku.cis.radar.model.v2.GeometryEntry</class>
-		<class>at.jku.cis.radar.model.v2.GeometryEvolutionEntry</class>
-		<class>at.jku.cis.radar.model.v2.FeatureEntry</class>
+		<class>at.jku.cis.radar.model.BaseEntity</class>
+		<class>at.jku.cis.radar.model.Event</class>
+		<class>at.jku.cis.radar.model.Action</class>
+		<class>at.jku.cis.radar.model.GeometryEntry</class>
+		<class>at.jku.cis.radar.model.GeometryEvolutionEntry</class>
+		<class>at.jku.cis.radar.model.FeatureEntry</class>
 		<class>at.jku.cis.radar.converter.PeriodHibernateConverter</class>
 		<properties>
 			<property name="hibernate.dialect"

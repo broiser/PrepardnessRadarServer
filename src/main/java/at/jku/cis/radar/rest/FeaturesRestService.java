@@ -1,4 +1,4 @@
-package at.jku.cis.radar.rest.v2;
+package at.jku.cis.radar.rest;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,9 +19,9 @@ import org.joda.time.DateTime;
 
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
-import at.jku.cis.radar.model.v2.FeatureEntry;
-import at.jku.cis.radar.service.v2.FeatureEntryService;
-import at.jku.cis.radar.transformer.v2.FeatureEntryGeoJsonFeatureTransformer;
+import at.jku.cis.radar.model.FeatureEntry;
+import at.jku.cis.radar.service.FeatureEntryService;
+import at.jku.cis.radar.transformer.FeatureEntryGeoJsonFeatureTransformer;
 
 @Path("features")
 public class FeaturesRestService extends RestService {

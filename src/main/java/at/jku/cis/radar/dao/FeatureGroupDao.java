@@ -6,7 +6,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
-import at.jku.cis.radar.model.v2.FeatureEntry;
+import at.jku.cis.radar.model.FeatureEntry;
 
 @ApplicationScoped
 public class FeatureGroupDao extends AbstractDao<FeatureEntry> {

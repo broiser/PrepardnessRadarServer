@@ -1,4 +1,4 @@
-package at.jku.cis.radar.model.v2;
+package at.jku.cis.radar.model;
 
 import java.util.Date;
 
