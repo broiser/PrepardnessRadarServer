@@ -22,6 +22,7 @@ import at.jku.cis.radar.service.AccountService;
 public class AuthenticationRestService extends RestService {
     private static final String FROMAT_TOKEN = "RADAR{0}";
     private static final String TOKEN = "radarToken";
+    private static final String USERNAME = "username";
 
     @Inject
     private AccountService accountService;
@@ -33,6 +34,7 @@ public class AuthenticationRestService extends RestService {
             authenticate(credentials.getUsername(), credentials.getPassword());
             String token = issueToken(credentials.getUsername());
             httpServletRequest.getSession().setAttribute(TOKEN, token);
+            httpServletRequest.getSession().setAttribute(USERNAME, credentials.getUsername());
             return Response.ok(MessageFormat.format(FROMAT_TOKEN, token)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).build();

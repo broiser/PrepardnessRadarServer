@@ -20,7 +20,7 @@ public class GeometryEntryService implements Serializable {
 
     @Inject
     private GeometryEntryDao geometryEntryDao;
-
+    
     @Transactional
     public GeometryEntry create(GeometryEvolutionEntry geometryEvolutionEntry, Geometry geometry, GeometryStatus status) {
         GeometryEntry geometryEntry = new GeometryEntry();

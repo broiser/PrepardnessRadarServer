@@ -23,8 +23,8 @@ import at.jku.cis.radar.annotations.Secured;
 public class AuthenticationFilter implements ContainerRequestFilter {
 
     private static final String PREFIX_TOKEN = "RADAR";
-
     private static final String TOKEN = "token";
+    
     @Inject
     private HttpSession httpSession;
 
