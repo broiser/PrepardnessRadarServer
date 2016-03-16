@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 import at.jku.cis.radar.service.EventService;
 
 @Path("events")
-public class EventRestService extends RestService {
+public class EventsRestService extends RestService {
 
     @Inject
     private EventService eventService;

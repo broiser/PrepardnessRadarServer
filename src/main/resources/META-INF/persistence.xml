@@ -11,13 +11,14 @@
 		<class>at.jku.cis.radar.model.GeometryEntry</class>
 		<class>at.jku.cis.radar.model.GeometryEvolutionEntry</class>
 		<class>at.jku.cis.radar.model.FeatureEntry</class>
+		<class>at.jku.cis.radar.model.Account</class>
 		<class>at.jku.cis.radar.converter.PeriodHibernateConverter</class>
 		<properties>
 			<property name="hibernate.dialect"
 				value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.show_sql" value="true" />
-			<!-- <property name="hibernate.hbm2ddl.auto" value="create"/> -->
+			<!-- <property name="hibernate.hbm2ddl.auto" value="create" /> -->
 		</properties>
 	</persistence-unit>
 </persistence>
