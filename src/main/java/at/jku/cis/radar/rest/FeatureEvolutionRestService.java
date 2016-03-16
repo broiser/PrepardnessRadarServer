@@ -1,7 +1,6 @@
 package at.jku.cis.radar.rest;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -18,7 +17,6 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 import at.jku.cis.radar.builder.GeoJsonFeatureEvolutionBuilder;
-import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
 import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
 import at.jku.cis.radar.geojson.GeoJsonStatus;
@@ -67,6 +65,7 @@ public class FeatureEvolutionRestService extends RestService {
 		TreeMap<Date, GeoJsonFeatureEvolution> geoJsonFeatureMap = new TreeMap<>();
 		for (GeometryEvolutionEntry geometryEvolutionEntry : featureEntry.getGeometryEvolutionEntries()) {
 			GeometryCollection geometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
+			GeometryCollection erasedGeometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
 			for (GeometryEntry geometryEntry : geometryEvolutionEntry.getGeometryEntries()) {
 				GeoJsonFeatureEvolutionBuilder geoJsonFeatureEvolutionBuilder = new GeoJsonFeatureEvolutionBuilder()
 						.withFeatureGroup(featureEntry.getFeatureGroup()).withDate(geometryEvolutionEntry.getDate());
@@ -78,11 +77,27 @@ public class FeatureEvolutionRestService extends RestService {
 					geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection).withStatus(GeoJsonStatus.CREATED);
 					break;
 				case ERASED:
-					geometryCollection = geometryService.difference(geometryCollection, geometryEntry.getGeometry());
-					geoJsonFeatureEvolutionBuilder.withStatus(GeoJsonStatus.ERASED);
+					if (geometryCollection.isEmpty()) {
+						erasedGeometryCollection = (GeometryCollection) geometryEntry.getGeometry();
+					} else {
+						geometryCollection = geometryService.difference(geometryCollection,
+								geometryEntry.getGeometry());
+						if (!erasedGeometryCollection.isEmpty()) {
+							erasedGeometryCollection = geometryService.union(erasedGeometryCollection,
+									(GeometryCollection) geometryEntry.getGeometry());
+						}
+						geoJsonFeatureEvolutionBuilder.withStatus(GeoJsonStatus.ERASED);
+					}
 					break;
 				}
-				geoJsonFeatureMap.put(geometryEvolutionEntry.getDate(), geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection).build());
+				geoJsonFeatureMap.put(geometryEvolutionEntry.getDate(),
+						geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection).build());
+				if (!erasedGeometryCollection.isEmpty()) {
+					GeoJsonFeatureEvolution geoJsonFeatureEvolutionErased = new GeoJsonFeatureEvolutionBuilder()
+							.withDate(geometryEvolutionEntry.getDate()).withFeatureGroup(featureEntry.getFeatureGroup())
+							.withGeometry(erasedGeometryCollection).withStatus(GeoJsonStatus.ERASED).build();
+					geoJsonFeatureMap.put(geometryEvolutionEntry.getDate(), geoJsonFeatureEvolutionErased);
+				}
 			}
 
 		}
