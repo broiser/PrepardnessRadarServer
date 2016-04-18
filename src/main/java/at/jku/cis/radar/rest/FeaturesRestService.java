@@ -17,12 +17,14 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
 
+import at.jku.cis.radar.annotations.Secured;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
 import at.jku.cis.radar.model.FeatureEntry;
 import at.jku.cis.radar.service.FeatureEntryService;
 import at.jku.cis.radar.transformer.FeatureEntryGeoJsonFeatureTransformer;
 
+@Secured
 @Path("features")
 public class FeaturesRestService extends RestService {
 

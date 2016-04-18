@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -22,7 +23,7 @@ import at.jku.cis.radar.model.GeometryStatus;
 public class GeometryEvolutionEntryService implements Serializable {
 
     private static final String STATUS = "STATUS";
-    
+
     @Inject
     private GeometryEntryService geometryEntryService;
     @Inject
@@ -30,7 +31,7 @@ public class GeometryEvolutionEntryService implements Serializable {
 
     @Transactional
     public GeometryEvolutionEntry create(FeatureEntry featureEntry, Geometry geometry, Map<String, Object> properties) {
-        GeometryStatus geometryStatus = GeometryStatus.valueOf((String) properties.remove(STATUS));
+        GeometryStatus geometryStatus = determineGeometryStatus((String) properties.remove(STATUS));
         GeometryEvolutionEntry geometryEvolutionEntry = new GeometryEvolutionEntry();
         geometryEvolutionEntry.setDate(DateTime.now().toDate());
         geometryEvolutionEntry.setProperties(properties);
@@ -42,9 +43,13 @@ public class GeometryEvolutionEntryService implements Serializable {
         return geometryEvolutionEntryDao.save(geometryEvolutionEntry);
     }
 
+    private GeometryStatus determineGeometryStatus(String value) {
+        return StringUtils.isEmpty(value) ? GeometryStatus.CREATED : GeometryStatus.valueOf(value);
+    }
+
     @Transactional
     public GeometryEvolutionEntry edit(long id, Geometry geometry, Map<String, Object> properties) {
-        GeometryStatus geometryStatus = GeometryStatus.valueOf((String) properties.remove(STATUS));
+        GeometryStatus geometryStatus = determineGeometryStatus((String) properties.remove(STATUS));
         GeometryEvolutionEntry geometryEvolutionEntry = geometryEvolutionEntryDao.findById(id);
         geometryEvolutionEntry.getGeometryEntries()
                 .add(createGeometryEntry(geometryEvolutionEntry, geometry, geometryStatus));
