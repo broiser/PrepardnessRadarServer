@@ -1,6 +1,8 @@
 package at.jku.cis.radar.rest;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -55,30 +57,30 @@ public class FeatureEvolutionRestService extends RestService {
 	}
 
 	private GeoJsonFeatureCollection createGeoJsonFeatureCollection(FeatureEntry featureEntry, long from, long to) {
-		SortedMap<Date, GeoJsonFeatureEvolution> sortedMap = combineEditGeometries(featureEntry);
-		GeoJsonFeatureCollection geoJsonFeatureCollection = new GeoJsonFeatureCollection();
-		geoJsonFeatureCollection.getFeatures().addAll(sortedMap.subMap(new Date(from), new Date(to)).values());
+		List<GeoJsonFeatureEvolution> list = combineEditGeometries(featureEntry);
+		GeoJsonFeatureCollection geoJsonFeatureCollection = new GeoJsonFeatureCollection(list);
 		return geoJsonFeatureCollection;
 	}
 
-	private SortedMap<Date, GeoJsonFeatureEvolution> combineEditGeometries(FeatureEntry featureEntry) {
-		TreeMap<Date, GeoJsonFeatureEvolution> geoJsonFeatureMap = new TreeMap<>();
+	private List<GeoJsonFeatureEvolution> combineEditGeometries(FeatureEntry featureEntry) {
+		List<GeoJsonFeatureEvolution> geoJsonFeatureList = new ArrayList<>();
 		for (GeometryEvolutionEntry geometryEvolutionEntry : featureEntry.getGeometryEvolutionEntries()) {
 			GeometryCollection geometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
 			GeometryCollection erasedGeometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
+			GeoJsonFeatureEvolutionBuilder geoJsonFeatureEvolutionBuilder = new GeoJsonFeatureEvolutionBuilder()
+					.withFeatureGroup(featureEntry.getFeatureGroup()).withDate(geometryEvolutionEntry.getDate());
 			for (GeometryEntry geometryEntry : geometryEvolutionEntry.getGeometryEntries()) {
-				GeoJsonFeatureEvolutionBuilder geoJsonFeatureEvolutionBuilder = new GeoJsonFeatureEvolutionBuilder()
-						.withFeatureGroup(featureEntry.getFeatureGroup()).withDate(geometryEvolutionEntry.getDate());
 
 				switch (geometryEntry.getStatus()) {
 				case CREATED:
 					geometryCollection = geometryService.union(geometryCollection,
 							(GeometryCollection) geometryEntry.getGeometry());
-					geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection).withStatus(GeoJsonStatus.CREATED);
 					break;
 				case ERASED:
 					if (geometryCollection.isEmpty()) {
-						erasedGeometryCollection = (GeometryCollection) geometryEntry.getGeometry();
+						if (erasedGeometryCollection.isEmpty()) {
+							erasedGeometryCollection = (GeometryCollection) geometryEntry.getGeometry();
+						}
 					} else {
 						geometryCollection = geometryService.difference(geometryCollection,
 								geometryEntry.getGeometry());
@@ -86,21 +88,20 @@ public class FeatureEvolutionRestService extends RestService {
 							erasedGeometryCollection = geometryService.union(erasedGeometryCollection,
 									(GeometryCollection) geometryEntry.getGeometry());
 						}
-						geoJsonFeatureEvolutionBuilder.withStatus(GeoJsonStatus.ERASED);
 					}
 					break;
 				}
-				geoJsonFeatureMap.put(geometryEvolutionEntry.getDate(),
-						geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection).build());
-				if (!erasedGeometryCollection.isEmpty()) {
-					GeoJsonFeatureEvolution geoJsonFeatureEvolutionErased = new GeoJsonFeatureEvolutionBuilder()
-							.withDate(geometryEvolutionEntry.getDate()).withFeatureGroup(featureEntry.getFeatureGroup())
-							.withGeometry(erasedGeometryCollection).withStatus(GeoJsonStatus.ERASED).build();
-					geoJsonFeatureMap.put(geometryEvolutionEntry.getDate(), geoJsonFeatureEvolutionErased);
-				}
+			}
+			geoJsonFeatureList.add(geoJsonFeatureEvolutionBuilder
+					.withGeometry(geometryCollection).withStatus(GeoJsonStatus.CREATED).build());
+			if (!erasedGeometryCollection.isEmpty()) {
+				GeoJsonFeatureEvolution geoJsonFeatureEvolutionErased = new GeoJsonFeatureEvolutionBuilder()
+						.withDate(geometryEvolutionEntry.getDate()).withFeatureGroup(featureEntry.getFeatureGroup())
+						.withGeometry(erasedGeometryCollection).withStatus(GeoJsonStatus.ERASED).build();
+				geoJsonFeatureList.add(geoJsonFeatureEvolutionErased);
 			}
 
 		}
-		return geoJsonFeatureMap;
+		return geoJsonFeatureList;
 	}
 }
