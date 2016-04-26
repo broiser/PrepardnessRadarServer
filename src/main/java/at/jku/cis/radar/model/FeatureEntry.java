@@ -53,5 +53,4 @@ public class FeatureEntry extends BaseEntity {
     public void setGeometryEvolutionEntries(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
         this.geometryEvolutionEntries = geometryEvolutionEntries;
     }
-
 }

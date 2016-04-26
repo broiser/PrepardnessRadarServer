@@ -24,4 +24,10 @@ public interface GeoJsonObject extends Serializable {
     static final String COORDINATES = "coordinates";
     static final String GEOMETRIES = "geometries";
 
+    static final String STATUS = "STATUS";
+    static final String CREATOR = "creator";
+    static final String MODIFIER = "editor";
+    static final String CREATION_DATE = "creation_date";
+    static final String MODIFIED_DATE = "modified_date";
+
 }

@@ -1,8 +1,11 @@
 package at.jku.cis.radar.rest;
 
+import static at.jku.cis.radar.geojson.GeoJsonObject.STATUS;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -15,12 +18,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import at.jku.cis.radar.annotations.CurrentAccount;
 import at.jku.cis.radar.annotations.Secured;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
+import at.jku.cis.radar.model.Account;
 import at.jku.cis.radar.model.FeatureEntry;
+import at.jku.cis.radar.model.GeometryStatus;
 import at.jku.cis.radar.service.FeatureEntryService;
 import at.jku.cis.radar.transformer.FeatureEntryGeoJsonFeatureTransformer;
 
@@ -28,6 +35,9 @@ import at.jku.cis.radar.transformer.FeatureEntryGeoJsonFeatureTransformer;
 @Path("features")
 public class FeaturesRestService extends RestService {
 
+    @Inject
+    @CurrentAccount
+    private Account account;
     @Inject
     private FeatureEntryService featureEntryService;
     @Inject
@@ -51,7 +61,6 @@ public class FeaturesRestService extends RestService {
         return Response.ok(buildGeoJsonFeatureCollection(featureEntries)).build();
     }
 
-
     @PUT
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
@@ -64,8 +73,12 @@ public class FeaturesRestService extends RestService {
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response createFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
-        FeatureEntry featureEntry = geoJsonFeature.getFeatureGroup() < 1 ? createFeatureEntry(eventId, geoJsonFeature)
-                : evolveFeatureEntry(geoJsonFeature);
+        FeatureEntry featureEntry;
+        if (geoJsonFeature.getFeatureGroup() < 1) {
+            featureEntry = createFeatureEntry(eventId, account.getUsername(), geoJsonFeature);
+        } else {
+            featureEntry = evolveFeatureEntry(account.getUsername(), geoJsonFeature);
+        }
         return Response.ok(featureEntry.getFeatureGroup()).build();
     }
 
@@ -75,17 +88,29 @@ public class FeaturesRestService extends RestService {
         return new GeoJsonFeatureCollection(new ArrayList<GeoJsonFeature>(geoJsonFeatures));
     }
 
-    private FeatureEntry createFeatureEntry(long eventId, GeoJsonFeature geoJsonFeature) {
-        return featureEntryService.create(eventId, geoJsonFeature.getGeometry(), geoJsonFeature.getProperties());
+    private FeatureEntry createFeatureEntry(long eventId, String username, GeoJsonFeature geoJsonFeature) {
+        GeometryStatus geometryStatus = determineGeometryStatus(determineStatus(geoJsonFeature));
+        return featureEntryService.create(eventId, username, geometryStatus, geoJsonFeature.getGeometry());
     }
 
     private FeatureEntry editFeatureEntry(GeoJsonFeature geoJsonFeature) {
         long featureGroup = geoJsonFeature.getFeatureGroup();
-        return featureEntryService.edit(featureGroup, geoJsonFeature.getGeometry(), geoJsonFeature.getProperties());
+        GeometryStatus geometryStatus = determineGeometryStatus(determineStatus(geoJsonFeature));
+        return featureEntryService.edit(featureGroup, geometryStatus, geoJsonFeature.getGeometry());
     }
 
-    private FeatureEntry evolveFeatureEntry(GeoJsonFeature geoJsonFeature) {
+    private FeatureEntry evolveFeatureEntry(String username, GeoJsonFeature geoJsonFeature) {
         long featureGroup = geoJsonFeature.getFeatureGroup();
-        return featureEntryService.evolve(featureGroup, geoJsonFeature.getGeometry(), geoJsonFeature.getProperties());
+        Map<String, Object> properties = geoJsonFeature.getProperties();
+        GeometryStatus geometryStatus = determineGeometryStatus((String) properties.get(STATUS));
+        return featureEntryService.evolve(featureGroup, username, geometryStatus, geoJsonFeature.getGeometry());
+    }
+
+    private GeometryStatus determineGeometryStatus(String value) {
+        return StringUtils.isEmpty(value) ? GeometryStatus.CREATED : GeometryStatus.valueOf(value);
+    }
+
+    private String determineStatus(GeoJsonFeature geoJsonFeature) {
+        return (String) geoJsonFeature.getProperties().get(STATUS);
     }
 }

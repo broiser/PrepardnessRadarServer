@@ -1,8 +1,12 @@
 
 package at.jku.cis.radar.builder;
 
+import static at.jku.cis.radar.geojson.GeoJsonObject.CREATION_DATE;
+import static at.jku.cis.radar.geojson.GeoJsonObject.CREATOR;
+import static at.jku.cis.radar.geojson.GeoJsonObject.MODIFIED_DATE;
+import static at.jku.cis.radar.geojson.GeoJsonObject.MODIFIER;
+
 import java.io.Serializable;
-import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -22,9 +26,20 @@ public class GeoJsonFeatureBuilder implements Serializable {
         return this;
     }
 
-    public GeoJsonFeatureBuilder withProperties(Map<String, Object> properties) {
-        geoJsonFeature.getProperties().putAll(properties);
-        return this;
+    public void withCreator(String username) {
+        geoJsonFeature.getProperties().put(CREATOR, username);
+    }
+    
+    public void withCreationDate(String creationDate){
+        geoJsonFeature.getProperties().put(CREATION_DATE, creationDate);
+    }
+    
+    public void withModifier(String username){
+        geoJsonFeature.getProperties().put(MODIFIER, username);
+    }
+    
+    public void withModifiedDate(String modifiedDate){
+        geoJsonFeature.getProperties().put(MODIFIED_DATE, modifiedDate);
     }
 
     public GeoJsonFeature build() {
