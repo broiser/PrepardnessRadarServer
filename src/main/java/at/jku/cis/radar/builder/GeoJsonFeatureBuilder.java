@@ -3,8 +3,10 @@ package at.jku.cis.radar.builder;
 
 import static at.jku.cis.radar.geojson.GeoJsonObject.CREATION_DATE;
 import static at.jku.cis.radar.geojson.GeoJsonObject.CREATOR;
+import static at.jku.cis.radar.geojson.GeoJsonObject.DESCRIPTION;
 import static at.jku.cis.radar.geojson.GeoJsonObject.MODIFIED_DATE;
 import static at.jku.cis.radar.geojson.GeoJsonObject.MODIFIER;
+import static at.jku.cis.radar.geojson.GeoJsonObject.TITLE;
 
 import java.io.Serializable;
 
@@ -26,20 +28,33 @@ public class GeoJsonFeatureBuilder implements Serializable {
         return this;
     }
 
-    public void withCreator(String username) {
-        geoJsonFeature.getProperties().put(CREATOR, username);
+    public GeoJsonFeatureBuilder withTitle(String title) {
+        return withProperty(TITLE, title);
+    }
+
+    public GeoJsonFeatureBuilder withDescription(String description) {
+        return withProperty(DESCRIPTION, description);
+    }
+
+    public GeoJsonFeatureBuilder withCreator(String username) {
+        return withProperty(CREATOR, username);
+    }
+
+    public GeoJsonFeatureBuilder withCreationDate(String creationDate) {
+        return withProperty(CREATION_DATE, creationDate);
+    }
+
+    public GeoJsonFeatureBuilder withModifier(String username) {
+        return withProperty(MODIFIER, username);
+    }
+
+    public GeoJsonFeatureBuilder withModifiedDate(String modifiedDate) {
+        return withProperty(MODIFIED_DATE, modifiedDate);
     }
     
-    public void withCreationDate(String creationDate){
-        geoJsonFeature.getProperties().put(CREATION_DATE, creationDate);
-    }
-    
-    public void withModifier(String username){
-        geoJsonFeature.getProperties().put(MODIFIER, username);
-    }
-    
-    public void withModifiedDate(String modifiedDate){
-        geoJsonFeature.getProperties().put(MODIFIED_DATE, modifiedDate);
+    private GeoJsonFeatureBuilder withProperty(String label, Object value) {
+        geoJsonFeature.getProperties().put(label, value);
+        return this;
     }
 
     public GeoJsonFeature build() {
