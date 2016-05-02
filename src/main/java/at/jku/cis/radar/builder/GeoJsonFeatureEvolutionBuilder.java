@@ -2,7 +2,6 @@ package at.jku.cis.radar.builder;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -12,21 +11,6 @@ import at.jku.cis.radar.geojson.GeoJsonStatus;
 public class GeoJsonFeatureEvolutionBuilder implements Serializable {
 
     private GeoJsonFeatureEvolution geoJsonFeatureEvolution = new GeoJsonFeatureEvolution();
-
-    public GeoJsonFeatureEvolutionBuilder withProperties(Map<String, Object> properties) {
-        geoJsonFeatureEvolution.getProperties().putAll(properties);
-        return this;
-    }
-
-    public GeoJsonFeatureEvolutionBuilder withStatus(GeoJsonStatus status) {
-        geoJsonFeatureEvolution.setStatus(status);
-        return this;
-    }
-
-    public GeoJsonFeatureEvolutionBuilder withDate(Date date) {
-        geoJsonFeatureEvolution.setDate(date);
-        return this;
-    }
 
     public GeoJsonFeatureEvolutionBuilder withGeometry(Geometry geometry) {
         geoJsonFeatureEvolution.setGeometry(geometry);
@@ -38,6 +22,16 @@ public class GeoJsonFeatureEvolutionBuilder implements Serializable {
         return this;
     }
 
+    public GeoJsonFeatureEvolutionBuilder withStatus(GeoJsonStatus status) {
+        geoJsonFeatureEvolution.setStatus(status);
+        return this;
+    }
+
+    public GeoJsonFeatureEvolutionBuilder withCreationDate(Date date) {
+        geoJsonFeatureEvolution.setCreationDate(date);
+        return this;
+    }
+    
     public GeoJsonFeatureEvolution build() {
         return geoJsonFeatureEvolution;
     }

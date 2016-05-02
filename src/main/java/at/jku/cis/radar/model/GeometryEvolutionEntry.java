@@ -2,9 +2,7 @@ package at.jku.cis.radar.model;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,9 +11,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -31,15 +29,18 @@ public class GeometryEvolutionEntry extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private FeatureEntry featureEntry;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "geometryEvolutionEntry", cascade = CascadeType.ALL)
-    private List<GeometryEntry> geometryEntries = new ArrayList<>();
-
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
-    @Transient
-    private Map<String, Object> properties = new HashMap<>();
+    @OneToOne
+    private Account account;
+
+    @OneToOne
+    private GeometryEvolutionContent geometryEvolutionContent;
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "geometryEvolutionEntry", cascade = CascadeType.ALL)
+    private List<GeometryEntry> geometryEntries = new ArrayList<>();
 
     public FeatureEntry getFeatureEntry() {
         return featureEntry;
@@ -57,19 +58,27 @@ public class GeometryEvolutionEntry extends BaseEntity {
         this.date = date;
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public GeometryEvolutionContent getGeometryEvolutionContent() {
+        return geometryEvolutionContent;
+    }
+
+    public void setGeometryEvolutionContent(GeometryEvolutionContent geometryEvolutionContent) {
+        this.geometryEvolutionContent = geometryEvolutionContent;
+    }
+
     public List<GeometryEntry> getGeometryEntries() {
         return geometryEntries;
     }
 
     public void setGeometryEntries(List<GeometryEntry> geometryEntries) {
         this.geometryEntries = geometryEntries;
-    }
-
-    public Map<String, Object> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Map<String, Object> properties) {
-        this.properties = properties;
     }
 }

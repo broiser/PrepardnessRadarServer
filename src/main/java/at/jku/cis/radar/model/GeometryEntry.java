@@ -16,18 +16,13 @@ import org.hibernate.annotations.Type;
 import com.vividsolutions.jts.geom.Geometry;
 
 @Entity
-// @NamedQuery(name = GeometryEntry.FIND_GEOMETRIES_BY_EVOLUTION_ID, query =
-// "select ge from GeometryEntry ge where ge.geometryEvolutionEntry.id =
-// :evolutionId order by ge.date")
 public class GeometryEntry extends BaseEntity {
-
-    public static final String FIND_GEOMETRIES_BY_EVOLUTION_ID = "GeometryEntry.findGeometriesByEvolutionId";
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private GeometryEvolutionEntry geometryEvolutionEntry;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private GeometryEvolutionEntry geometryEvolutionEntry;
 
     @Type(type = "org.hibernate.spatial.GeometryType")
     @Column(name = "geometry", columnDefinition = "Geometry")

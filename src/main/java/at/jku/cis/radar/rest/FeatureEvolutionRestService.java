@@ -63,6 +63,7 @@ public class FeatureEvolutionRestService extends RestService {
         return geoJsonFeatureCollection;
     }
 
+    // TODO Refactoring
     private SortedMap<Date, GeoJsonFeatureEvolution> combineEditGeometries(FeatureEntry featureEntry) {
         TreeMap<Date, GeoJsonFeatureEvolution> geoJsonFeatureMap = new TreeMap<>();
         for (GeometryEvolutionEntry geometryEvolutionEntry : featureEntry.getGeometryEvolutionEntries()) {
@@ -70,7 +71,7 @@ public class FeatureEvolutionRestService extends RestService {
             GeometryCollection erasedGeometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
             for (GeometryEntry geometryEntry : geometryEvolutionEntry.getGeometryEntries()) {
                 GeoJsonFeatureEvolutionBuilder geoJsonFeatureEvolutionBuilder = new GeoJsonFeatureEvolutionBuilder()
-                        .withFeatureGroup(featureEntry.getFeatureGroup()).withDate(geometryEvolutionEntry.getDate());
+                        .withFeatureGroup(featureEntry.getFeatureGroup()).withCreationDate(geometryEvolutionEntry.getDate());
 
                 switch (geometryEntry.getStatus()) {
                 case CREATED:
@@ -96,7 +97,7 @@ public class FeatureEvolutionRestService extends RestService {
                         geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection).build());
                 if (!erasedGeometryCollection.isEmpty()) {
                     GeoJsonFeatureEvolution geoJsonFeatureEvolutionErased = new GeoJsonFeatureEvolutionBuilder()
-                            .withDate(geometryEvolutionEntry.getDate()).withFeatureGroup(featureEntry.getFeatureGroup())
+                            .withCreationDate(geometryEvolutionEntry.getDate()).withFeatureGroup(featureEntry.getFeatureGroup())
                             .withGeometry(erasedGeometryCollection).withStatus(GeoJsonStatus.ERASED).build();
                     geoJsonFeatureMap.put(geometryEvolutionEntry.getDate(), geoJsonFeatureEvolutionErased);
                 }

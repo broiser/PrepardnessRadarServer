@@ -13,6 +13,7 @@
 		<class>at.jku.cis.radar.model.FeatureEntry</class>
 		<class>at.jku.cis.radar.model.Account</class>
 		<class>at.jku.cis.radar.converter.PeriodHibernateConverter</class>
+		<class>at.jku.cis.radar.model.GeometryEvolutionContent</class>
 		<properties>
 			<property name="hibernate.dialect"
 				value="org.hibernate.spatial.dialect.postgis.PostgisDialect" />
