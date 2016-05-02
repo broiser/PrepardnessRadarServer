@@ -10,32 +10,30 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import at.jku.cis.radar.model.Account;
+import at.jku.cis.radar.model.AuthenticationToken;
 import at.jku.cis.radar.service.AccountService;
 
 @Path("/authentication")
 public class AuthenticationRestService extends RestService {
-    private static final String FROMAT_TOKEN = "RADAR{0}";
-    private static final String TOKEN = "radarToken";
+    private static final String FORMAT_TOKEN = "RADAR{0}";
+    private static final String TOKEN = "token";
     private static final String USERNAME = "username";
 
     @Inject
     private AccountService accountService;
 
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
     public Response authenticateAccount(Credentials credentials, @Context HttpServletRequest httpServletRequest) {
         try {
             authenticate(credentials.getUsername(), credentials.getPassword());
             String token = issueToken(credentials.getUsername());
             httpServletRequest.getSession().setAttribute(TOKEN, token);
             httpServletRequest.getSession().setAttribute(USERNAME, credentials.getUsername());
-            return Response.ok(MessageFormat.format(FROMAT_TOKEN, token)).build();
+            return Response.ok(new AuthenticationToken(MessageFormat.format(FORMAT_TOKEN, token))).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }

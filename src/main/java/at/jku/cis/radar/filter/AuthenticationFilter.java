@@ -24,7 +24,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     private static final String PREFIX_TOKEN = "RADAR";
     private static final String TOKEN = "token";
-    
+
     @Inject
     private HttpSession httpSession;
 
@@ -44,7 +44,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     private void validateToken(String token) throws Exception {
         String currentToken = (String) httpSession.getAttribute(TOKEN);
-        if (!currentToken.equals(token)) {
+        if (currentToken != null && StringUtils.equals(currentToken, token)) {
             throw new IllegalArgumentException("Token doesn't match.");
         }
     }
