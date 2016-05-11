@@ -1,7 +1,6 @@
 package at.jku.cis.radar.transformer;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -33,15 +32,29 @@ public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<Featur
 
     @Override
     public GeoJsonFeature transform(FeatureEntry featureEntry) {
-        List<GeometryEvolutionEntry> geometryEvolutionEntries = featureEntry.getGeometryEvolutionEntries();
+        GeometryEvolutionEntry firstGeometryEvolutionEntry = getFirstGeometryEvolutionEntry(featureEntry);
+        GeometryEvolutionEntry lastGeometryEvolutionEntry = getLastGeometryEvolutionEntry(featureEntry);
+        
         GeoJsonFeatureBuilder geoJsonFeatureBuilder = new GeoJsonFeatureBuilder();
+        geoJsonFeatureBuilder.withTitle(featureEntry.getTitle());
         geoJsonFeatureBuilder.withFeatureGroup(featureEntry.getFeatureGroup());
-        geoJsonFeatureBuilder.withCreator(determineCreator(geometryEvolutionEntries));
-        geoJsonFeatureBuilder.withModifier(determineModifier(geometryEvolutionEntries));
-        geoJsonFeatureBuilder.withCreationDate(dateMarshaller.marshal(determineCreationDate(geometryEvolutionEntries)));
-        geoJsonFeatureBuilder.withModifiedDate(dateMarshaller.marshal(determineModifiedDate(geometryEvolutionEntries)));
-        geoJsonFeatureBuilder.withGeometry(combineGeometry(geometryEvolutionEntries));
+        geoJsonFeatureBuilder.withDescription(featureEntry.getDescription());
+        geoJsonFeatureBuilder.withCreator(firstGeometryEvolutionEntry.getAccount().getUsername());
+        geoJsonFeatureBuilder.withModifier(lastGeometryEvolutionEntry.getAccount().getUsername());
+        geoJsonFeatureBuilder.withCreationDate(dateMarshaller.marshal(firstGeometryEvolutionEntry.getDate()));
+        geoJsonFeatureBuilder.withModifiedDate(dateMarshaller.marshal(lastGeometryEvolutionEntry.getDate()));
+        geoJsonFeatureBuilder.withGeometry(combineGeometry(featureEntry.getGeometryEvolutionEntries()));
         return geoJsonFeatureBuilder.build();
+    }
+
+    private GeometryEvolutionEntry getLastGeometryEvolutionEntry(FeatureEntry featureEntry) {
+        int size = featureEntry.getGeometryEvolutionEntries().size();
+        return size < 1 ? null : featureEntry.getGeometryEvolutionEntries().get(size - 1);
+    }
+
+    private GeometryEvolutionEntry getFirstGeometryEvolutionEntry(FeatureEntry featureEntry) {
+        List<GeometryEvolutionEntry> geometryEvolutionEntries = featureEntry.getGeometryEvolutionEntries();
+        return geometryEvolutionEntries.isEmpty() ? null : geometryEvolutionEntries.get(0);
     }
 
     private Geometry combineGeometry(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
@@ -72,33 +85,6 @@ public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<Featur
 
     private GeometryCollection unionGeometries(GeometryCollection geometryCollection, GeometryEntry geometryEntry) {
         return geometryService.union(geometryCollection, (GeometryCollection) geometryEntry.getGeometry());
-    }
-
-    private String determineCreator(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
-        return geometryEvolutionEntries.isEmpty() ? null
-                : getFirstGeometryEvolution(geometryEvolutionEntries).getAccount().getUsername();
-    }
-
-    private String determineModifier(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
-        return geometryEvolutionEntries.isEmpty() ? null
-                : getLastGeometryEvolution(geometryEvolutionEntries).getAccount().getUsername();
-    }
-
-    private Date determineCreationDate(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
-        return geometryEvolutionEntries.isEmpty() ? null
-                : getFirstGeometryEvolution(geometryEvolutionEntries).getDate();
-    }
-
-    private Date determineModifiedDate(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
-        return geometryEvolutionEntries.isEmpty() ? null : getLastGeometryEvolution(geometryEvolutionEntries).getDate();
-    }
-
-    private GeometryEvolutionEntry getFirstGeometryEvolution(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
-        return geometryEvolutionEntries.get(0);
-    }
-
-    private GeometryEvolutionEntry getLastGeometryEvolution(List<GeometryEvolutionEntry> geometryEvolutionEntries) {
-        return geometryEvolutionEntries.get(geometryEvolutionEntries.size() - 1);
     }
 
     @SuppressWarnings("static-access")
