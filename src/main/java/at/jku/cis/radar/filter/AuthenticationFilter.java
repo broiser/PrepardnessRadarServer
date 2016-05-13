@@ -1,51 +1,91 @@
 package at.jku.cis.radar.filter;
 
 import java.io.IOException;
+import java.security.Principal;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 
 import at.jku.cis.radar.annotations.Secured;
+import at.jku.cis.radar.storage.TokenStorage;
 
 @Secured
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
-    private static final String PREFIX_TOKEN = "RADAR";
-    private static final String TOKEN = "token";
+    private static final String TOKEN_PREFIX = "RADAR";
 
     @Inject
-    private HttpSession httpSession;
+    private TokenStorage tokenStorage;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader == null || !authorizationHeader.startsWith(PREFIX_TOKEN)) {
+        String requestToken = determineRequestToken(requestContext);
+        
+        if (startsWithTokenPrefix(requestToken)) {
             throw new NotAuthorizedException("Authorization header must be provided");
         }
-
-        try {
-            validateToken(authorizationHeader.replace(PREFIX_TOKEN, StringUtils.EMPTY));
-        } catch (Exception e) {
+        
+        String token = requestToken.replace(TOKEN_PREFIX, StringUtils.EMPTY);
+        if (!tokenStorage.containsToken(token)) {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+        } else {
+            requestContext.setSecurityContext(createSecurityContext(token));
         }
     }
 
-    private void validateToken(String token) throws Exception {
-        String currentToken = (String) httpSession.getAttribute(TOKEN);
-        if (currentToken != null && StringUtils.equals(currentToken, token)) {
-            throw new IllegalArgumentException("Token doesn't match.");
-        }
+    private String determineRequestToken(ContainerRequestContext requestContext) {
+        return requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+    }
+
+    private boolean startsWithTokenPrefix(String token) {
+        return StringUtils.isEmpty(token) || !token.startsWith(TOKEN_PREFIX);
+    }
+
+    private SecurityContext createSecurityContext(final String token) {
+        return new SecurityContext() {
+
+            @Override
+            public Principal getUserPrincipal() {
+
+                return createPrincipal(token);
+            }
+
+            @Override
+            public boolean isUserInRole(String role) {
+                return true;
+            }
+
+            @Override
+            public boolean isSecure() {
+                return false;
+            }
+
+            @Override
+            public String getAuthenticationScheme() {
+                return StringUtils.EMPTY;
+            }
+        };
+    }
+
+    private Principal createPrincipal(final String token) {
+        return new Principal() {
+
+            @Override
+            public String getName() {
+                return tokenStorage.getUsername(token);
+            }
+        };
     }
 }

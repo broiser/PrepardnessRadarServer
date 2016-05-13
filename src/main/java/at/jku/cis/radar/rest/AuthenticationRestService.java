@@ -16,13 +16,14 @@ import javax.ws.rs.core.Response;
 import at.jku.cis.radar.model.Account;
 import at.jku.cis.radar.model.AuthenticationToken;
 import at.jku.cis.radar.service.AccountService;
+import at.jku.cis.radar.storage.TokenStorage;
 
 @Path("/authentication")
 public class AuthenticationRestService extends RestService {
     private static final String FORMAT_TOKEN = "RADAR{0}";
-    private static final String TOKEN = "token";
-    private static final String USERNAME = "username";
 
+    @Inject
+    private TokenStorage tokenStorage;
     @Inject
     private AccountService accountService;
 
@@ -31,9 +32,8 @@ public class AuthenticationRestService extends RestService {
         try {
             authenticate(credentials.getUsername(), credentials.getPassword());
             String token = issueToken(credentials.getUsername());
-            httpServletRequest.getSession().setAttribute(TOKEN, token);
-            httpServletRequest.getSession().setAttribute(USERNAME, credentials.getUsername());
-            return Response.ok(new AuthenticationToken(MessageFormat.format(FORMAT_TOKEN, token))).build();
+            tokenStorage.storeToken(token, credentials.getUsername());
+            return Response.ok(buildAuthenticationToken(token)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -49,6 +49,10 @@ public class AuthenticationRestService extends RestService {
     private String issueToken(String username) {
         Random random = new SecureRandom(username.getBytes());
         return new BigInteger(130, random).toString(32);
+    }
+
+    private AuthenticationToken buildAuthenticationToken(String token) {
+        return new AuthenticationToken(MessageFormat.format(FORMAT_TOKEN, token));
     }
 
     @SuppressWarnings("unused")

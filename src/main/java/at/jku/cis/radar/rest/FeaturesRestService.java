@@ -14,18 +14,18 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import at.jku.cis.radar.annotations.CurrentAccount;
 import at.jku.cis.radar.annotations.Secured;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
-import at.jku.cis.radar.model.Account;
 import at.jku.cis.radar.model.FeatureEntry;
 import at.jku.cis.radar.model.GeometryStatus;
 import at.jku.cis.radar.service.FeatureEntryService;
@@ -35,9 +35,6 @@ import at.jku.cis.radar.transformer.FeatureEntryGeoJsonFeatureTransformer;
 @Path("features")
 public class FeaturesRestService extends RestService {
 
-    @Inject
-    @CurrentAccount
-    private Account account;
     @Inject
     private FeatureEntryService featureEntryService;
     @Inject
@@ -72,14 +69,30 @@ public class FeaturesRestService extends RestService {
     @POST
     @Path("{eventId}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response createFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature) {
+    public Response createFeature(@PathParam("eventId") long eventId, GeoJsonFeature geoJsonFeature,
+            @Context SecurityContext securityContext) {
+        String username = securityContext.getUserPrincipal().getName();
+
         FeatureEntry featureEntry;
         if (geoJsonFeature.getFeatureGroup() < 1) {
-            featureEntry = createFeatureEntry(eventId, account.getUsername(), geoJsonFeature);
+            featureEntry = createFeatureEntry(eventId, username, geoJsonFeature);
         } else {
-            featureEntry = evolveFeatureEntry(account.getUsername(), geoJsonFeature);
+            featureEntry = evolveFeatureEntry(username, geoJsonFeature);
         }
+        
         return Response.ok(featureEntry.getFeatureGroup()).build();
+    }
+
+    @POST
+    @Path("title/{featureGroup}")
+    public void updateTitle(@PathParam("featureGroup") long featureGroup, String title) {
+        featureEntryService.updateTitle(featureGroup, title);
+    }
+
+    @POST
+    @Path("description/{featureGroup}")
+    public void updateDescription(@PathParam("featureGroup") long featureGroup, String description) {
+        featureEntryService.updateDescription(featureGroup, description);
     }
 
     private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEntry> featureEntries) {
