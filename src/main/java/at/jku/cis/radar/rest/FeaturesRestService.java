@@ -83,18 +83,6 @@ public class FeaturesRestService extends RestService {
         return Response.ok(featureEntry.getFeatureGroup()).build();
     }
 
-    @POST
-    @Path("title/{featureGroup}")
-    public void updateTitle(@PathParam("featureGroup") long featureGroup, String title) {
-        featureEntryService.updateTitle(featureGroup, title);
-    }
-
-    @POST
-    @Path("description/{featureGroup}")
-    public void updateDescription(@PathParam("featureGroup") long featureGroup, String description) {
-        featureEntryService.updateDescription(featureGroup, description);
-    }
-
     private GeoJsonFeatureCollection buildGeoJsonFeatureCollection(List<FeatureEntry> featureEntries) {
         Collection<GeoJsonFeature> geoJsonFeatures = CollectionUtils.collect(featureEntries,
                 featureEntryGeoJsonFeatureTransformer);
@@ -120,7 +108,7 @@ public class FeaturesRestService extends RestService {
     }
 
     private GeometryStatus determineGeometryStatus(String value) {
-        return StringUtils.isEmpty(value) ? GeometryStatus.CREATED : GeometryStatus.valueOf(value);
+        return StringUtils.isEmpty(value) ? GeometryStatus.CREATED : GeometryStatus.valueOf(value.toUpperCase());
     }
 
     private String determineStatus(GeoJsonFeature geoJsonFeature) {

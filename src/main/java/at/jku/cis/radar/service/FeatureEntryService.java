@@ -79,10 +79,11 @@ public class FeatureEntryService implements Serializable {
     }
 
     @Transactional
-    public void updateTitle(long featureGroup, String title) {
+    public FeatureEntry updateFeatureContent(long featureGroup, String title, String description) {
         FeatureEntry featureEntry = findByFeatureGroup(featureGroup);
         featureEntry.setTitle(title);
-        featureEntryDao.save(featureEntry);
+        featureEntry.setDescription(description);
+        return featureEntryDao.save(featureEntry);
     }
 
     @Transactional
