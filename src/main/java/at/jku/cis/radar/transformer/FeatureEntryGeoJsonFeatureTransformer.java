@@ -13,7 +13,6 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 import at.jku.cis.radar.builder.GeoJsonFeatureBuilder;
-import at.jku.cis.radar.comparator.DateMarshaller;
 import at.jku.cis.radar.geojson.GeoJsonFeature;
 import at.jku.cis.radar.model.FeatureEntry;
 import at.jku.cis.radar.model.GeometryEntry;
@@ -27,34 +26,13 @@ public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<Featur
     private GeometryService geometryService;
     @Inject
     private GeometryFactory geometryFactory;
-    @Inject
-    private DateMarshaller dateMarshaller;
 
     @Override
     public GeoJsonFeature transform(FeatureEntry featureEntry) {
-        GeometryEvolutionEntry firstGeometryEvolutionEntry = getFirstGeometryEvolutionEntry(featureEntry);
-        GeometryEvolutionEntry lastGeometryEvolutionEntry = getLastGeometryEvolutionEntry(featureEntry);
-        
         GeoJsonFeatureBuilder geoJsonFeatureBuilder = new GeoJsonFeatureBuilder();
-        geoJsonFeatureBuilder.withTitle(featureEntry.getTitle());
         geoJsonFeatureBuilder.withFeatureGroup(featureEntry.getFeatureGroup());
-        geoJsonFeatureBuilder.withDescription(featureEntry.getDescription());
-        geoJsonFeatureBuilder.withCreator(firstGeometryEvolutionEntry.getAccount().getUsername());
-        geoJsonFeatureBuilder.withModifier(lastGeometryEvolutionEntry.getAccount().getUsername());
-        geoJsonFeatureBuilder.withCreationDate(dateMarshaller.marshal(firstGeometryEvolutionEntry.getDate()));
-        geoJsonFeatureBuilder.withModifiedDate(dateMarshaller.marshal(lastGeometryEvolutionEntry.getDate()));
         geoJsonFeatureBuilder.withGeometry(combineGeometry(featureEntry.getGeometryEvolutionEntries()));
         return geoJsonFeatureBuilder.build();
-    }
-
-    private GeometryEvolutionEntry getLastGeometryEvolutionEntry(FeatureEntry featureEntry) {
-        int size = featureEntry.getGeometryEvolutionEntries().size();
-        return size < 1 ? null : featureEntry.getGeometryEvolutionEntries().get(size - 1);
-    }
-
-    private GeometryEvolutionEntry getFirstGeometryEvolutionEntry(FeatureEntry featureEntry) {
-        List<GeometryEvolutionEntry> geometryEvolutionEntries = featureEntry.getGeometryEvolutionEntries();
-        return geometryEvolutionEntries.isEmpty() ? null : geometryEvolutionEntries.get(0);
     }
 
     private Geometry combineGeometry(List<GeometryEvolutionEntry> geometryEvolutionEntries) {

@@ -120,7 +120,7 @@ public class FeaturesRestService extends RestService {
     }
 
     private GeometryStatus determineGeometryStatus(String value) {
-        return StringUtils.isEmpty(value) ? GeometryStatus.CREATED : GeometryStatus.valueOf(value);
+        return StringUtils.isEmpty(value) ? GeometryStatus.CREATED : GeometryStatus.valueOf(value.toUpperCase());
     }
 
     private String determineStatus(GeoJsonFeature geoJsonFeature) {
