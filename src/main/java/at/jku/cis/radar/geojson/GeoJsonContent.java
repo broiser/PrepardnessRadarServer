@@ -84,5 +84,4 @@ public class GeoJsonContent implements Serializable {
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
-
 }

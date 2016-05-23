@@ -36,9 +36,9 @@ public class FeatureContentRestService extends RestService {
     }
 
     private FeatureEntry updateFeatureContent(GeoJsonContent geoJsonContent) {
-        long featureGroup = geoJsonContent.getFeatureGroup();
+        String title = geoJsonContent.getTitle();
         String description = geoJsonContent.getDescription();
-        return featureEntryService.updateFeatureContent(featureGroup, geoJsonContent.getTitle(), description);
+        return featureEntryService.updateFeatureContent(geoJsonContent.getFeatureGroup(), title, description);
     }
 
     private GeoJsonContent buildFeatureContent(FeatureEntry featureEntry) {
