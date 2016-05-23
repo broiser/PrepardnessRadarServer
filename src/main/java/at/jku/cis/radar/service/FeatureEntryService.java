@@ -86,13 +86,6 @@ public class FeatureEntryService implements Serializable {
         return featureEntryDao.save(featureEntry);
     }
 
-    @Transactional
-    public void updateDescription(long featureGroup, String description) {
-        FeatureEntry featureEntry = findByFeatureGroup(featureGroup);
-        featureEntry.setDescription(description);
-        featureEntryDao.save(featureEntry);
-    }
-
     private GeometryEvolutionEntry createGeometryEvolutionEntry(FeatureEntry featureEntry, String username,
             GeometryStatus geometryStatus, Geometry geometry) {
         GeometryEvolutionEntry geometryEvolutionEntry = geometryEvolutionEntryService.create(username, geometryStatus,

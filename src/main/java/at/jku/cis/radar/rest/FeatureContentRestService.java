@@ -7,6 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
+
 import at.jku.cis.radar.annotations.Secured;
 import at.jku.cis.radar.geojson.GeoJsonContent;
 import at.jku.cis.radar.model.FeatureEntry;
@@ -36,12 +38,16 @@ public class FeatureContentRestService extends RestService {
     }
 
     private FeatureEntry updateFeatureContent(GeoJsonContent geoJsonContent) {
-        String title = geoJsonContent.getTitle();
-        String description = geoJsonContent.getDescription();
+        String title = convertValue(geoJsonContent.getTitle());
+        String description = convertValue(geoJsonContent.getDescription());
         return featureEntryService.updateFeatureContent(geoJsonContent.getFeatureGroup(), title, description);
     }
 
     private GeoJsonContent buildFeatureContent(FeatureEntry featureEntry) {
         return featureEntryGeoJsonContentTransformer.transform(featureEntry);
+    }
+
+    private String convertValue(String title) {
+        return StringUtils.isNotEmpty(title) ? title : null;
     }
 }
