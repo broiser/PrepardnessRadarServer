@@ -1,15 +1,15 @@
 package at.jku.cis.radar.storage;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class TokenStorage implements Serializable {
 
-    private final Map<String, String> token2Username = new HashMap<>();
+    private final Map<String, String> token2Username = new ConcurrentHashMap<>();
 
     public void storeToken(String token, String username) {
         token2Username.put(token, username);
