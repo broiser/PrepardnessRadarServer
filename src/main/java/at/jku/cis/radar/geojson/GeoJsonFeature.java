@@ -9,6 +9,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import at.jku.cis.radar.geometry.GeometryDeserializer;
+import at.jku.cis.radar.geometry.GeometrySerializer;
+
 public class GeoJsonFeature implements GeoJsonObject {
 
     @JsonProperty(value = FEATURE_ID)

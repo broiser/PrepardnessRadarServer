@@ -35,9 +35,6 @@ public class GeometryEvolutionEntry extends BaseEntity {
     @OneToOne
     private Account account;
 
-    @OneToOne
-    private GeometryEvolutionContent geometryEvolutionContent;
-
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "geometryEvolutionEntry", cascade = CascadeType.ALL)
     private List<GeometryEntry> geometryEntries = new ArrayList<>();
@@ -64,14 +61,6 @@ public class GeometryEvolutionEntry extends BaseEntity {
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-    public GeometryEvolutionContent getGeometryEvolutionContent() {
-        return geometryEvolutionContent;
-    }
-
-    public void setGeometryEvolutionContent(GeometryEvolutionContent geometryEvolutionContent) {
-        this.geometryEvolutionContent = geometryEvolutionContent;
     }
 
     public List<GeometryEntry> getGeometryEntries() {

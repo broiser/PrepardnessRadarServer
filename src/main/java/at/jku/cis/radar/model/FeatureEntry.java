@@ -3,6 +3,7 @@ package at.jku.cis.radar.model;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -25,7 +26,10 @@ public class FeatureEntry extends BaseEntity {
 
     @OneToOne
     private Event event;
+    private String title;
+    @Column(length = 1024)
     private long featureGroup;
+    private String description;
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "featureEntry", cascade = CascadeType.ALL)
     private List<GeometryEvolutionEntry> geometryEvolutionEntries;
@@ -38,12 +42,28 @@ public class FeatureEntry extends BaseEntity {
         this.event = event;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public long getFeatureGroup() {
         return featureGroup;
     }
 
     public void setFeatureGroup(long featureGroup) {
         this.featureGroup = featureGroup;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<GeometryEvolutionEntry> getGeometryEvolutionEntries() {

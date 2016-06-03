@@ -2,7 +2,7 @@ package at.jku.cis.radar.model;
 
 import java.io.Serializable;
 
-public class AuthenticationToken implements Serializable{
+public class AuthenticationToken implements Serializable {
 
     private String value;
 

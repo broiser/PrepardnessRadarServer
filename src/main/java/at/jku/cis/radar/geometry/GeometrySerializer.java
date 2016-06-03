@@ -1,4 +1,4 @@
-package at.jku.cis.radar.geojson;
+package at.jku.cis.radar.geometry;
 
 import static at.jku.cis.radar.geojson.GeoJsonObject.COORDINATES;
 import static at.jku.cis.radar.geojson.GeoJsonObject.GEOMETRIES;
