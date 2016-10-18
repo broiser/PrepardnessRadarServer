@@ -55,9 +55,6 @@ public class GeometryService implements Serializable {
                 } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
                     diffGeometry = createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry));
                 }
-            } else {
-            	//TODO problem nicht gleich hinzufügen, wenn 1x kein Abschnitt erfolgen kann..
-                //geometryList.add(geometry);
             }
         }
         geometryList.add(diffGeometry);

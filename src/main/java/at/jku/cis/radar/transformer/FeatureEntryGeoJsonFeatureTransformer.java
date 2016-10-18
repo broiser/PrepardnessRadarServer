@@ -1,6 +1,7 @@
 package at.jku.cis.radar.transformer;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -32,6 +33,8 @@ public class FeatureEntryGeoJsonFeatureTransformer implements Transformer<Featur
         GeoJsonFeatureBuilder geoJsonFeatureBuilder = new GeoJsonFeatureBuilder();
         geoJsonFeatureBuilder.withFeatureGroup(featureEntry.getFeatureGroup());
         geoJsonFeatureBuilder.withGeometry(combineGeometry(featureEntry.getGeometryEvolutionEntries()));
+        Date lastModifiedDate = featureEntry.getGeometryEvolutionEntries().get(featureEntry.getGeometryEvolutionEntries().size()-1).getDate();
+        geoJsonFeatureBuilder.withLastModifiedDate(lastModifiedDate);
         return geoJsonFeatureBuilder.build();
     }
 

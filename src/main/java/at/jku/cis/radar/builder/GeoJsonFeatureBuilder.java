@@ -2,6 +2,8 @@
 package at.jku.cis.radar.builder;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -19,6 +21,13 @@ public class GeoJsonFeatureBuilder implements Serializable {
     public GeoJsonFeatureBuilder withFeatureGroup(long featureGroup) {
         geoJsonFeature.setFeatureGroup(featureGroup);
         return this;
+    }
+    
+    public GeoJsonFeatureBuilder withLastModifiedDate(Date date){
+    	HashMap<String, Object> properties = new HashMap<>();
+    	properties.put("date", date);
+    	geoJsonFeature.setProperties(properties);
+    	return this;
     }
 
     public GeoJsonFeature build() {
