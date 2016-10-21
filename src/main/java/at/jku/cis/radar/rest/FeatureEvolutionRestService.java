@@ -1,6 +1,5 @@
 package at.jku.cis.radar.rest;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,7 +13,6 @@ import org.apache.commons.collections4.Predicate;
 import org.joda.time.DateTime;
 
 import at.jku.cis.radar.annotations.Secured;
-import at.jku.cis.radar.comparator.GeoJsonFeatureEvolutionComparator;
 import at.jku.cis.radar.geojson.GeoJsonFeatureCollection;
 import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
 import at.jku.cis.radar.model.FeatureEntry;
@@ -27,8 +25,6 @@ public class FeatureEvolutionRestService extends RestService {
 
     @Inject
     private FeatureEntryService featureEntryService;
-    @Inject
-    private GeoJsonFeatureEvolutionComparator geoJsonFeatureEvolutionComparator;
     @Inject
     private FeatureEntryGeoJsonFeatureEvolutionTransformer featureEntryGeoJsonFeatureEvolutionTransformer;
 
@@ -54,7 +50,6 @@ public class FeatureEvolutionRestService extends RestService {
             final long to) {
         List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = featureEntryGeoJsonFeatureEvolutionTransformer
                 .transform(featureEntry);
-        Collections.sort(geoJsonFeatureEvolutions, geoJsonFeatureEvolutionComparator);
         CollectionUtils.filter(geoJsonFeatureEvolutions, new Predicate<GeoJsonFeatureEvolution>() {
             @Override
             public boolean evaluate(GeoJsonFeatureEvolution evolution) {

@@ -1,6 +1,7 @@
 package at.jku.cis.radar.transformer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 import at.jku.cis.radar.builder.GeoJsonFeatureEvolutionBuilder;
+import at.jku.cis.radar.comparator.GeoJsonFeatureEvolutionComparator;
 import at.jku.cis.radar.geojson.GeoJsonFeatureEvolution;
 import at.jku.cis.radar.geojson.GeoJsonStatus;
 import at.jku.cis.radar.model.FeatureEntry;
@@ -29,6 +31,8 @@ public class FeatureEntryGeoJsonFeatureEvolutionTransformer
     private GeometryService geometryService;
     @Inject
     private GeometryFactory geometryFactory;
+    @Inject
+    private GeoJsonFeatureEvolutionComparator geoJsonFeatureEvolutionComparator;
 
     @Override
     public List<GeoJsonFeatureEvolution> transform(FeatureEntry featureEntry) {
@@ -37,6 +41,8 @@ public class FeatureEntryGeoJsonFeatureEvolutionTransformer
         for (GeometryEvolutionEntry geometryEvolutionEntry : featureEntry.getGeometryEvolutionEntries()) {
             geoJsonFeatureEvolutions.addAll(transform(featureEntry.getFeatureGroup(), geometryEvolutionEntry));
         }
+
+        Collections.sort(geoJsonFeatureEvolutions, geoJsonFeatureEvolutionComparator);
         return geoJsonFeatureEvolutions;
     }
 
