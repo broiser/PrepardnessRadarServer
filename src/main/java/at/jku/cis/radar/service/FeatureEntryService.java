@@ -31,17 +31,17 @@ public class FeatureEntryService implements Serializable {
     @Inject
     private GeometryEvolutionEntryService geometryEvolutionEntryService;
 
-    public List<FeatureEntry> findAllByEvent(long eventId, DateTime from, DateTime to) {
+    public List<FeatureEntry> findByEvent(long eventId, DateTime from, DateTime to) {
         Event event = eventService.findById(eventId);
         if (event == null) {
             return Collections.emptyList();
         }
-        return findAllByEvent(event, from, to);
+        DateTime fromDate = from.minus(event.getValidationPeriod());
+        return findByEvent(event, fromDate, to);
     }
 
-    private List<FeatureEntry> findAllByEvent(Event event, DateTime from, DateTime to) {
-        DateTime fromDate = from.minus(event.getValidationPeriod());
-        return featureEntryDao.findAllByEvent(event.getId(), fromDate.toDate(), to.toDate());
+    private List<FeatureEntry> findByEvent(Event event, DateTime from, DateTime to) {
+        return featureEntryDao.findByEventAndDate(event.getId(), from.toDate(), to.toDate());
     }
 
     public FeatureEntry findByFeatureGroup(long featureGroup) {

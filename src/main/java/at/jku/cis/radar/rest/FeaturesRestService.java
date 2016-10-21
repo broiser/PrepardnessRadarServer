@@ -54,7 +54,7 @@ public class FeaturesRestService extends RestService {
         DateTime toDate = new DateTime(to);
         DateTime fromDate = new DateTime(from);
 
-        List<FeatureEntry> featureEntries = featureEntryService.findAllByEvent(eventId, fromDate, toDate);
+        List<FeatureEntry> featureEntries = featureEntryService.findByEvent(eventId, fromDate, toDate);
         return Response.ok(buildGeoJsonFeatureCollection(featureEntries)).build();
     }
 

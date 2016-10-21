@@ -16,16 +16,16 @@ public class FeatureEntryGeoJsonContentTransformer implements Transformer<Featur
         GeometryEvolutionEntry firstGeometryEvolutionEntry = getFirstGeometryEvolutionEntry(featureEntry);
         GeometryEvolutionEntry lastGeometryEvolutionEntry = getLastGeometryEvolutionEntry(featureEntry);
 
-        GeoJsonContentBuilder geoJsonContentBuilder = new GeoJsonContentBuilder();
-        geoJsonContentBuilder.withTitle(featureEntry.getTitle());
-        geoJsonContentBuilder.withEvent(featureEntry.getEvent());
-        geoJsonContentBuilder.withFeatureGroup(featureEntry.getFeatureGroup());
-        geoJsonContentBuilder.withDescription(featureEntry.getDescription());
-        geoJsonContentBuilder.withCreator(firstGeometryEvolutionEntry.getAccount().getUsername());
-        geoJsonContentBuilder.withModifier(lastGeometryEvolutionEntry.getAccount().getUsername());
-        geoJsonContentBuilder.withCreationDate(firstGeometryEvolutionEntry.getDate());
-        geoJsonContentBuilder.withModifiedDate(lastGeometryEvolutionEntry.getDate());
-        return geoJsonContentBuilder.build();
+        GeoJsonContentBuilder builder = new GeoJsonContentBuilder();
+        builder.withTitle(featureEntry.getTitle());
+        builder.withEvent(featureEntry.getEvent());
+        builder.withFeatureGroup(featureEntry.getFeatureGroup());
+        builder.withDescription(featureEntry.getDescription());
+        builder.withCreator(firstGeometryEvolutionEntry.getAccount().getUsername());
+        builder.withModifier(lastGeometryEvolutionEntry.getAccount().getUsername());
+        builder.withCreationDate(firstGeometryEvolutionEntry.getDate());
+        builder.withModifiedDate(lastGeometryEvolutionEntry.getDate());
+        return builder.build();
     }
 
     private GeometryEvolutionEntry getLastGeometryEvolutionEntry(FeatureEntry featureEntry) {
