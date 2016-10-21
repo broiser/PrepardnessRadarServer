@@ -46,19 +46,18 @@ public class GeometryService implements Serializable {
 
     private List<Geometry> difference(Geometry geometry, Geometry geometryToIntersect) {
         List<Geometry> geometryList = new ArrayList<>();
+        Geometry diffGeometry = geometry;
         for (int j = 0; j < geometryToIntersect.getNumGeometries(); j++) {
-            if (geometry.intersects(geometryToIntersect.getGeometryN(j))) {
-                Geometry intersectionGeometry = geometry.difference(geometryToIntersect.getGeometryN(j));
+            if (diffGeometry.intersects(geometryToIntersect.getGeometryN(j))) {
+                Geometry intersectionGeometry = diffGeometry.difference(geometryToIntersect.getGeometryN(j));
                 if (intersectionGeometry instanceof Polygon && !intersectionGeometry.isEmpty()) {
-                    geometryList.add(createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry)));
+                    diffGeometry = createMultiPolygon(polygonRepairerService.repair((Polygon) intersectionGeometry));
                 } else if (intersectionGeometry instanceof MultiPolygon && !intersectionGeometry.isEmpty()) {
-                    geometryList.add(
-                            createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry)));
+                    diffGeometry = createMultiPolygon(polygonRepairerService.repair((MultiPolygon) intersectionGeometry));
                 }
-            } else {
-                geometryList.add(geometry);
             }
         }
+        geometryList.add(diffGeometry);
         return geometryList;
     }
 
