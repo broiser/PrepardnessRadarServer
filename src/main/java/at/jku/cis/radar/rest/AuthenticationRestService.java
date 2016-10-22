@@ -3,7 +3,6 @@ package at.jku.cis.radar.rest;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.security.auth.login.LoginException;
@@ -47,8 +46,7 @@ public class AuthenticationRestService extends RestService {
     }
 
     private String issueToken(String username) {
-        Random random = new SecureRandom(username.getBytes());
-        return new BigInteger(130, random).toString(32);
+        return new BigInteger(130, new SecureRandom(username.getBytes())).toString(32);
     }
 
     private AuthenticationToken buildAuthenticationToken(String token) {

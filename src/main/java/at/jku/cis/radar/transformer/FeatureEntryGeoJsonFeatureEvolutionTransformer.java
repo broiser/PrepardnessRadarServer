@@ -39,14 +39,14 @@ public class FeatureEntryGeoJsonFeatureEvolutionTransformer
         List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = new ArrayList<>();
 
         for (GeometryEvolutionEntry geometryEvolutionEntry : featureEntry.getGeometryEvolutionEntries()) {
-            geoJsonFeatureEvolutions.addAll(transform(featureEntry.getFeatureGroup(), geometryEvolutionEntry));
+            geoJsonFeatureEvolutions.addAll(transform(geometryEvolutionEntry));
         }
 
         Collections.sort(geoJsonFeatureEvolutions, geoJsonFeatureEvolutionComparator);
         return geoJsonFeatureEvolutions;
     }
 
-    private List<GeoJsonFeatureEvolution> transform(long featureGroup, GeometryEvolutionEntry geometryEvolutionEntry) {
+    private List<GeoJsonFeatureEvolution> transform(GeometryEvolutionEntry geometryEvolutionEntry) {
         GeometryCollection erasedGeometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
         GeometryCollection createdGeometryCollection = geometryFactory.createGeometryCollection(new Geometry[0]);
 
@@ -70,36 +70,31 @@ public class FeatureEntryGeoJsonFeatureEvolutionTransformer
             }
         }
 
+        return buildGeoJsonFeatureEvolutions(geometryEvolutionEntry.getFeatureEntry().getFeatureGroup(),
+                geometryEvolutionEntry.getDate(), createdGeometryCollection, erasedGeometryCollection);
+    }
+
+    private List<GeoJsonFeatureEvolution> buildGeoJsonFeatureEvolutions(long featureGroup, Date date,
+            GeometryCollection createdGeometryCollection, GeometryCollection erasedGeometryCollection) {
         List<GeoJsonFeatureEvolution> geoJsonFeatureEvolutions = new ArrayList<>();
+
         if (!isGeometryEmpty(createdGeometryCollection)) {
-            GeoJsonFeatureEvolution geoJsonFeatureEvolution = buildCreatedGeoJsonGeometry(featureGroup,
-                    geometryEvolutionEntry.getDate(), createdGeometryCollection);
-            geoJsonFeatureEvolutions.add(geoJsonFeatureEvolution);
+            geoJsonFeatureEvolutions.add(
+                    buildGeoJsonFeatureEvolution(featureGroup, date, createdGeometryCollection, GeoJsonStatus.CREATED));
         }
         if (!isGeometryEmpty(erasedGeometryCollection)) {
-            GeoJsonFeatureEvolution geoJsonFeatureEvolution = buildErasedGeoJsonGeometry(featureGroup,
-                    geometryEvolutionEntry.getDate(), erasedGeometryCollection);
-            geoJsonFeatureEvolutions.add(geoJsonFeatureEvolution);
+            geoJsonFeatureEvolutions.add(
+                    buildGeoJsonFeatureEvolution(featureGroup, date, erasedGeometryCollection, GeoJsonStatus.ERASED));
         }
         return geoJsonFeatureEvolutions;
     }
 
-    private GeoJsonFeatureEvolution buildErasedGeoJsonGeometry(long featureGroup, Date date,
-            GeometryCollection geometryCollection) {
-        return buildGeoJsonGeometry(featureGroup, date, geometryCollection, GeoJsonStatus.ERASED);
-    }
-
-    private GeoJsonFeatureEvolution buildCreatedGeoJsonGeometry(long featureGroup, Date date,
-            GeometryCollection geometryCollection) {
-        return buildGeoJsonGeometry(featureGroup, date, geometryCollection, GeoJsonStatus.CREATED);
-    }
-
-    private GeoJsonFeatureEvolution buildGeoJsonGeometry(long featureGroup, Date date,
-            GeometryCollection geometryCollection, GeoJsonStatus status) {
+    private GeoJsonFeatureEvolution buildGeoJsonFeatureEvolution(long featureGroup, Date date, Geometry geometry,
+            GeoJsonStatus status) {
         GeoJsonFeatureEvolutionBuilder geoJsonFeatureEvolutionBuilder = new GeoJsonFeatureEvolutionBuilder();
         geoJsonFeatureEvolutionBuilder.withFeatureGroup(featureGroup);
         geoJsonFeatureEvolutionBuilder.withCreationDate(date);
-        geoJsonFeatureEvolutionBuilder.withGeometry(geometryCollection);
+        geoJsonFeatureEvolutionBuilder.withGeometry(geometry);
         geoJsonFeatureEvolutionBuilder.withStatus(status);
         return geoJsonFeatureEvolutionBuilder.build();
     }

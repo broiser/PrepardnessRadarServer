@@ -5,7 +5,6 @@ import static at.jku.cis.radar.geojson.GeoJsonObject.GEOMETRIES;
 import static at.jku.cis.radar.geojson.GeoJsonObject.TYPE;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -23,7 +22,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometrySerializer extends JsonSerializer<Geometry> {
-    private static final String NOT_IMPLEMENTED = "Not implemented: {0}";
 
     @Override
     public Class<Geometry> handledType() {
@@ -53,8 +51,7 @@ public class GeometrySerializer extends JsonSerializer<Geometry> {
         } else if (geometry instanceof GeometryCollection) {
             writeGeometryCollection(jsonGenerator, (GeometryCollection) geometry);
         } else {
-            throw new UnsupportedOperationException(
-                    MessageFormat.format(NOT_IMPLEMENTED, geometry.getClass().getSimpleName()));
+            throw new UnsupportedOperationException();
         }
     }
 
